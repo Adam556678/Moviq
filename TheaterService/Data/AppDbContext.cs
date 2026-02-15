@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using TheaterService.Models;
 
 namespace TheaterService.Data
 {
@@ -8,5 +9,11 @@ namespace TheaterService.Data
         {
             
         }
+
+        public DbSet<Hall> Halls { get; set; }
+        public DbSet<Seat> Seats { get; set; }
+        public DbSet<Showtime> Showtimes { get; set; }
+        public DbSet<ShowtimeSeat> ShowtimeSeats { get; set; }
+        public DbSet<Price> Prices { get; set; }
     }
 }

@@ -1,0 +1,9 @@
+# .NET build outputs
+**/bin/
+**/obj/
+
+# VS files
+**/.vs/
+
+**/appsettings.json
+**/appsettings.Development.json
