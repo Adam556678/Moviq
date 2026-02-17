@@ -8,7 +8,7 @@ namespace MoviesService.Data
         Task<IEnumerable<Movie>> GetAllMoviesAsync();
 
         // Get a single movie by Id
-        Task<Movie?> GetMovieByIdAsync(int id);
+        Task<Movie?> GetMovieByIdAsync(Guid id);
 
         // Add a new movie
         Task AddMovieAsync(Movie movie);

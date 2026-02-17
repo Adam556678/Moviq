@@ -12,7 +12,7 @@ namespace MoviesService.Data
 
         Task<bool> SaveChangesAsync();
 
-        Task<Genre?> GetGenreByIdAsync(int id);
+        Task<Genre?> GetGenreByIdAsync(Guid id);
 
     }    
 }

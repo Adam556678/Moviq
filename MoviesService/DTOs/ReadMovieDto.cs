@@ -2,7 +2,7 @@ namespace MoviesService.DTOs
 {
     public record ReadMovieDto(
     
-        int Id,
+        Guid Id,
         string Title,
         string? Synopsis,
         DateTime ReleaseDate,

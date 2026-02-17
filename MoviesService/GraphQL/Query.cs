@@ -44,7 +44,7 @@ namespace MoviesService.GraphQL
 
             return movieDtos;
         }
-        public async Task<Movie?> GetMovieById(int id, [Service] IMovieRepo repo)
+        public async Task<Movie?> GetMovieById(Guid id, [Service] IMovieRepo repo)
             => await repo.GetMovieByIdAsync(id);
         
         public async Task<IEnumerable<Genre>> GetGenres([Service] IGenreRepo repo) 

@@ -3,6 +3,8 @@ using MoviesService.DTOs;
 using MoviesService.Models;
 using HotChocolate;
 using HotChocolate.Authorization;
+using MoviesService.Services.AsyncDataService;
+using MoviesService.Services.AsyncDataService.Events;
 
 namespace MoviesService.GraphQL
 {
@@ -12,7 +14,8 @@ namespace MoviesService.GraphQL
         public async Task<Movie> AddMovie(
             AddMovieDto input,
             [Service] IMovieRepo movieRepo,
-            [Service] IGenreRepo genreRepo
+            [Service] IGenreRepo genreRepo,
+            [Service] IEventBusClient eventBusClient
         )
         {
             // Create a movie entity with no genres
@@ -40,6 +43,23 @@ namespace MoviesService.GraphQL
 
             await movieRepo.AddMovieAsync(movie);
             await movieRepo.SaveChangesAsync();
+
+            // Publish MovieCreated Event
+            try
+            {
+                var movieCreatedEvent = new MovieCreatedEvent
+                {
+                    Id = movie.Id,
+                    Title = movie.Title
+                };
+                await eventBusClient.PublishNewMovie(movieCreatedEvent);
+            }
+            catch (Exception ex)
+            {
+                
+                Console.WriteLine($"--> Couldn't publish event, {ex.Message}");
+            }
+
             
             return movie;
         }
@@ -65,7 +85,7 @@ namespace MoviesService.GraphQL
 
         [Authorize(Roles = new[] {"Admin"})]
         public async Task<Movie> UpdateMovie(
-            int id,
+            Guid id,
             UpdateMovieDto input,
             [Service] IMovieRepo movieRepo,
             [Service] IGenreRepo genreRepo
@@ -111,7 +131,10 @@ namespace MoviesService.GraphQL
         }
 
         [Authorize(Roles = new[] {"Admin"})]
-        public async Task<bool> DeleteMovie(int id, [Service] IMovieRepo movieRepo)
+        public async Task<bool> DeleteMovie(
+            Guid id, 
+            [Service] IMovieRepo movieRepo,
+            [Service] IEventBusClient eventBusClient)
         {
             // get movie and check if exist
             var movie = await movieRepo.GetMovieByIdAsync(id);
@@ -120,11 +143,28 @@ namespace MoviesService.GraphQL
             
             movieRepo.DeleteMovie(movie);
             await movieRepo.SaveChangesAsync();
+
+            // Publish MovieDeleted Event 
+            try
+            {
+                var movieDeletedEvent = new MovieDeletedEvent
+                {
+                    Id = movie.Id,
+                    Title = movie.Title
+                };
+                await eventBusClient.PublishMovieDeleted(movieDeletedEvent);
+            }
+            catch (Exception ex)
+            {
+                
+                Console.WriteLine($"--> Couldn't publish event, {ex.Message}");
+            }
+
             return true;
         }
 
         [Authorize(Roles = new[] {"Admin"})]
-        public async Task<bool> DeleteGenre(int id, [Service] IGenreRepo genreRepo)
+        public async Task<bool> DeleteGenre(Guid id, [Service] IGenreRepo genreRepo)
         {
             // get genre and check if exist
             var genre = await genreRepo.GetGenreByIdAsync(id);

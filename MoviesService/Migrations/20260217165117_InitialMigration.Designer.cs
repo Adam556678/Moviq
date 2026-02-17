@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MoviesService.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260207094821_InitialMigration")]
+    [Migration("20260217165117_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -27,11 +27,11 @@ namespace MoviesService.Migrations
 
             modelBuilder.Entity("GenreMovie", b =>
                 {
-                    b.Property<int>("GenresId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("GenresId")
+                        .HasColumnType("uuid");
 
-                    b.Property<int>("MoviesId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("MoviesId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("GenresId", "MoviesId");
 
@@ -42,11 +42,9 @@ namespace MoviesService.Migrations
 
             modelBuilder.Entity("MoviesService.Models.Genre", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -59,11 +57,9 @@ namespace MoviesService.Migrations
 
             modelBuilder.Entity("MoviesService.Models.Movie", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Duration")
                         .HasColumnType("integer");

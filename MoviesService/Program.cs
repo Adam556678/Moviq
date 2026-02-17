@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MoviesService.Data;
+using MoviesService.Services.AsyncDataService;
 using MoviesService.Services.Caching;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -71,6 +72,7 @@ builder.Services
 builder.Services.AddScoped<IMovieRepo, MovieRepo>();
 builder.Services.AddScoped<IGenreRepo, GenreRepo>();
 builder.Services.AddScoped<IRedisCacheService, RedisCacheService>();
+builder.Services.AddSingleton<IEventBusClient, EventBusClient>();
 
 
 var app = builder.Build();

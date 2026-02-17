@@ -28,7 +28,7 @@ namespace MoviesService.Data
             return await _context.Genres.ToListAsync();
         }
 
-        public async Task<Genre?> GetGenreByIdAsync(int id)
+        public async Task<Genre?> GetGenreByIdAsync(Guid id)
         {
             return await _context.Genres
             .Include(g => g.Movies)

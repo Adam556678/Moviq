@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -16,8 +15,7 @@ namespace MoviesService.Migrations
                 name: "Genres",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
@@ -29,8 +27,7 @@ namespace MoviesService.Migrations
                 name: "Movies",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Title = table.Column<string>(type: "text", nullable: false),
                     Synopsis = table.Column<string>(type: "text", nullable: true),
                     ReleaseDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -46,8 +43,8 @@ namespace MoviesService.Migrations
                 name: "GenreMovie",
                 columns: table => new
                 {
-                    GenresId = table.Column<int>(type: "integer", nullable: false),
-                    MoviesId = table.Column<int>(type: "integer", nullable: false)
+                    GenresId = table.Column<Guid>(type: "uuid", nullable: false),
+                    MoviesId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {

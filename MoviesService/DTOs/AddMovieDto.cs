@@ -6,6 +6,6 @@ namespace MoviesService.DTOs
         int Duration, 
         DateTime ReleaseDate,
         string? Language,
-        List<int> GenreIds
+        List<Guid> GenreIds
     );
 }

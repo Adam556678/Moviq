@@ -8,7 +8,8 @@ namespace TheaterService.Models
 
         public required string Name { get; set; }
 
-        public int TotalSeats { get; set; }
+        public int NumRows { get; set; }
+        public int NumColumns { get; set; }
 
         public HallType HallType { get; set; } = HallType.Standard;
 
