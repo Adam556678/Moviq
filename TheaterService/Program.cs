@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TheaterService.Data;
+using TheaterService.Services;
+using TheaterService.Services.AsyncDataService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +11,9 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<AppDbContext>(options => 
     options.UseNpgsql(builder.Configuration.GetConnectionString("TheaterConn")));
+
+builder.Services.AddScoped<IMoviesService, MoviesService>();
+builder.Services.AddHostedService<EventBusSubscriber>();
 
 builder.Services.AddScoped<IHallRepository, HallRepository>();
 

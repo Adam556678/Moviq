@@ -54,7 +54,11 @@ namespace MoviesService.Services.AsyncDataService
 
             _connection = await _factory.CreateConnectionAsync();
             _channel = await _connection.CreateChannelAsync();
-            await _channel.ExchangeDeclareAsync(exchange, ExchangeType.Direct);
+            await _channel.ExchangeDeclareAsync(
+                exchange, 
+                ExchangeType.Direct, 
+                durable: true
+            );
         }
 
         private async Task SendMessage(string exchange, string routingKey, string message)

@@ -19,7 +19,7 @@ namespace TheaterService.Data
                 throw new Exception("Invalid show start time");
             
             // Check if movie exists
-            if (!_context.)
+            // <<<<<<--------------- HERE IS THE PROBLEM
         }
 
         public void DeleteShowtime(Showtime showtime)

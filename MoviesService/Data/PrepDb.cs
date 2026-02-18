@@ -66,6 +66,7 @@ namespace MoviesService.Data
 
                 await context.SaveChangesAsync();
                 Console.WriteLine("--> Seeding complete!");
+
             }
             else
             {

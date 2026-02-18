@@ -15,5 +15,7 @@ namespace TheaterService.Data
         public DbSet<Showtime> Showtimes { get; set; }
         public DbSet<ShowtimeSeat> ShowtimeSeats { get; set; }
         public DbSet<Price> Prices { get; set; }
+
+        public DbSet<Movie> Movies { get; set; }
     }
 }
