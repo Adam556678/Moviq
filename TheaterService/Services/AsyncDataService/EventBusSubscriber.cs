@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using TheaterService.Models;
 using TheaterService.Services.Events;
 
 namespace TheaterService.Services.AsyncDataService
@@ -12,11 +13,15 @@ namespace TheaterService.Services.AsyncDataService
         private IConnection? _connection;
         private IChannel? _channel;
         private readonly IConfiguration _configuration;
+        private readonly IServiceScopeFactory _scopeFactory;
 
-        public EventBusSubscriber(IConfiguration configuration)
+        public EventBusSubscriber(
+            IConfiguration configuration,
+            IServiceScopeFactory scopeFactory    
+        )
         {
             _configuration = configuration;
-            // TODO: Inject IServiceScopeFactory in the constructor
+            _scopeFactory = scopeFactory;
         }
 
         private async Task InitializeRabbitMQ()
@@ -62,6 +67,9 @@ namespace TheaterService.Services.AsyncDataService
             var consumer = new AsyncEventingBasicConsumer(_channel!);
 
             consumer.ReceivedAsync += async (sender, args)=> {
+                using var scope = _scopeFactory.CreateScope();
+                var moviesService = scope.ServiceProvider.GetRequiredService<IMoviesService>();
+
                 var routingKey = args.RoutingKey;
                 var body = Encoding.UTF8.GetString(args.Body.ToArray());
 
@@ -72,8 +80,15 @@ namespace TheaterService.Services.AsyncDataService
                     var movieCreated = JsonSerializer
                         .Deserialize<MovieCreatedEvent>(body);
 
-                    // TODO: add movie to DB
-                    
+                    if (movieCreated is null)
+                        throw new InvalidOperationException("MovieCreatedEvent deserialization failed");
+
+                    // add movie to DB
+                    await moviesService.AddMovieAsync( new Movie
+                    {
+                        Id = movieCreated.Id,
+                        Title = movieCreated.Title
+                    });
 
                 }
                 else if (routingKey == "movie.deleted")
@@ -81,7 +96,15 @@ namespace TheaterService.Services.AsyncDataService
                     var movieDeleted = 
                         JsonSerializer.Deserialize<MovieDeletedEvent>(body);
 
-                    // TODO: Remove movie from db
+                    if (movieDeleted is null)
+                        throw new InvalidOperationException("MovieDeletedEvent deserialization failed");
+
+                    // Remove movie from db
+                    await moviesService.DeleteMovieAsync(new Movie
+                    {
+                        Id = movieDeleted.Id,
+                        Title = movieDeleted.Title 
+                    });
                 }
 
                 // message processed, delete from queue

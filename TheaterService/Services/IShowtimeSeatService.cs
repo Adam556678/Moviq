@@ -1,10 +1,14 @@
+using TheaterService.Models;
+
 namespace TheaterService.Services
 {
     public interface IShowtimeSeatService
     {
-        Task InitializeSeatsForShowtime(Guid showtimeId);
+        void InitializeSeatsForShowtime(Showtime showtime);
 
         Task HandleSeatLockRequest();
+
+        Task HandleSeatReleaseRequest();
 
         Task ReserveSeat();
     }

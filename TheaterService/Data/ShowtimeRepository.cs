@@ -1,4 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using TheaterService.Models;
+using TheaterService.Services;
 
 namespace TheaterService.Data
 {
@@ -6,35 +8,74 @@ namespace TheaterService.Data
     {
 
         private readonly AppDbContext _context;
+        private readonly IMoviesService _movieService;
+        private readonly IShowtimeSeatService _showtimeSeatService;
 
-        public ShowtimeRepository(AppDbContext context)
+        public ShowtimeRepository(
+            AppDbContext context,
+            IMoviesService moviesService,
+            IShowtimeSeatService showtimeSeatService
+        )
         {
             _context = context;
+            _movieService = moviesService;
+            _showtimeSeatService = showtimeSeatService;
         }
 
-        public Task AddShowtimeAsync(Showtime showtime)
+        public async Task AddShowtimeAsync(Showtime showtime)
         {
             // Check if start time is valid 
             if (DateTime.UtcNow > showtime.StartTime)
-                throw new Exception("Invalid show start time");
+                throw new InvalidOperationException("Invalid show start time");
             
             // Check if movie exists
-            // <<<<<<--------------- HERE IS THE PROBLEM
+            if (! await _movieService.IsMovieExistAsync(showtime.MovieId))
+                throw new InvalidOperationException("Movie does not exist");
+
+            // Load Hall and check if it exists
+            var hall = await _context.Halls
+                .Include(h => h.Seats)
+                .FirstOrDefaultAsync(h => h.Id == showtime.HallId);
+
+            if (hall == null)
+                throw new InvalidOperationException("Hall does not exist");
+
+            showtime.Id = Guid.NewGuid();
+            showtime.Hall = hall;
+
+            // Initialize showtime seats
+            _showtimeSeatService.InitializeSeatsForShowtime(showtime);
+
+            // Add showtime to DB 
+            await _context.Showtimes.AddAsync(showtime);
         }
 
-        public void DeleteShowtime(Showtime showtime)
+        public async Task DeleteShowtimeAsync(Showtime showtime)
         {
-            throw new NotImplementedException();
+            var existing = await _context.Showtimes.FindAsync(showtime.Id);
+
+            if (existing != null){
+                _context.Showtimes.Remove(showtime);
+            }
         }
 
-        public Task<IEnumerable<Showtime>> GetAllShowtimesAsync()
+        public async Task<IEnumerable<Showtime>> GetAllShowtimesAsync()
         {
-            throw new NotImplementedException();
+            var showtimes = await _context.Showtimes
+                .Include(s => s.Hall)
+                .ToListAsync();
+            
+            return showtimes;
         }
 
         public void UpdateShowtime(Showtime showtime)
         {
-            throw new NotImplementedException();
+            _context.Showtimes.Update(showtime);
+        }
+
+        public async Task<bool> SaveChangesAsync()
+        {
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 }

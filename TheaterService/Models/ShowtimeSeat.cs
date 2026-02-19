@@ -18,8 +18,7 @@ namespace TheaterService.Models
         [ForeignKey("SeatId")]
         public virtual Seat Seat { get; set; } = default!;
 
-        [Required]
-        public required Guid ShowtimeId { get; set; }
+        public Guid ShowtimeId { get; set; }
 
         [ForeignKey("ShowtimeId")]
         public virtual Showtime Showtime { get; set; } = default!;

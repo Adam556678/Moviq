@@ -12,6 +12,9 @@ namespace TheaterService.Models
         [Required]
         public Guid MovieId { get; set; }
 
+        [ForeignKey("MovieId")]
+        public virtual Movie Movie { get; set; } = default!;
+
         [Required]
         public DateTime StartTime { get; set; }
 

@@ -10,7 +10,9 @@ namespace TheaterService.Data
 
         void UpdateShowtime(Showtime showtime);
 
-        void DeleteShowtime(Showtime showtime);
+        Task DeleteShowtimeAsync(Showtime showtime);
+
+        Task<bool> SaveChangesAsync();
 
     }
 }

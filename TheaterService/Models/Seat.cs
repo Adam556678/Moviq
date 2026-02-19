@@ -20,8 +20,7 @@ namespace TheaterService.Models
         
         public bool IsFunctional { get; set; } = true;
 
-        [Required]
-        public required Guid HallId { get; set; }
+        public Guid HallId { get; set; }
 
         [ForeignKey("HallId")]
         public virtual Hall Hall { get; set; } = default!;

@@ -16,6 +16,8 @@ builder.Services.AddScoped<IMoviesService, MoviesService>();
 builder.Services.AddHostedService<EventBusSubscriber>();
 
 builder.Services.AddScoped<IHallRepository, HallRepository>();
+builder.Services.AddScoped<IShowtimeSeatService, ShowtimeSeatService>();
+builder.Services.AddScoped<IShowtimeRepository, ShowtimeRepository>();
 
 var app = builder.Build();
 
@@ -26,5 +28,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+await PrepDb.PrepPopulation(app);
 
 app.Run();
