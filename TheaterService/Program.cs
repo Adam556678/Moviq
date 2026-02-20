@@ -19,6 +19,19 @@ builder.Services.AddScoped<IHallRepository, HallRepository>();
 builder.Services.AddScoped<IShowtimeSeatService, ShowtimeSeatService>();
 builder.Services.AddScoped<IShowtimeRepository, ShowtimeRepository>();
 
+builder.Services
+    .AddGraphQLServer()
+    .ModifyRequestOptions(opt =>
+    {
+        opt.IncludeExceptionDetails = true;
+    })
+    .AddAuthorization()
+    .AddQueryType<TheaterService.GraphQL.Query>()
+    .AddMutationType<TheaterService.GraphQL.Mutation>()
+    .AddProjections()
+    .AddFiltering()
+    .AddSorting();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -28,6 +41,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthorization();
+
+app.MapGraphQL();
 
 await PrepDb.PrepPopulation(app);
 

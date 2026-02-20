@@ -1,3 +1,4 @@
+using TheaterService.DTOs;
 using TheaterService.Models;
 
 namespace TheaterService.Data
@@ -6,15 +7,15 @@ namespace TheaterService.Data
     {
         Task AddHallAsync(Hall hall);
 
-        void EditHall(Hall hall);
+        Task<Hall> EditHall(UpdateHallDto input, Guid id);
 
         Task AddSeatAsync(Seat seat);
 
-        void EditSeat(Seat seat);
+        Task<Seat> EditSeat(UpdateSeatDto input, Guid id);
 
-        void DeleteHall(Hall hall);
+        Task DeleteHall(Guid id);
 
-        void DeleteSeat(Seat seat);
+        Task DeleteSeat(Guid id);
 
         Task<bool> SaveChangesAsync();
 

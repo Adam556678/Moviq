@@ -15,5 +15,24 @@ namespace TheaterService.Models
 
         public ICollection<Seat> Seats { get; set; } = new List<Seat>();
 
+        public void InitializeSeats()
+        {
+            if (Seats.Any())
+                throw new InvalidOperationException("Seats already initialized");
+
+            // Initialization logic
+            for (int row = 1; row <= NumRows; row++)
+            {
+                for (int col = 0; col < NumColumns; col++)
+                {
+                    Seats.Add(new Seat
+                    {
+                        Row = row,
+                        Column = col
+                    });
+                }
+            }
+        }
+
     }
 }

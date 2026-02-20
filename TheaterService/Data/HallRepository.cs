@@ -1,4 +1,6 @@
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using TheaterService.DTOs;
 using TheaterService.Models;
 
 namespace TheaterService.Data
@@ -30,30 +32,77 @@ namespace TheaterService.Data
             if (hall == null)
                 throw new Exception("Hall doesn't exist");
 
+            // check if position already exists
             if (hall.Seats.Any(s => s.Row == seat.Row && s.Column == seat.Column))
                 throw new Exception("Seat in this place already exists");
+
+            // if rows/columns greater than hall's rows/columns, throw an exception
+            if (seat.Column > hall.NumColumns || seat.Row > hall.NumRows)
+                throw new Exception("Invalid seat position");
 
             await _context.Seats.AddAsync(seat);
         }
 
-        public void DeleteHall(Hall hall)
+        public async Task DeleteHall(Guid id)
         {
+            var hall = await _context.Halls.FindAsync(id);
+
+            if (hall == null)
+                throw new InvalidOperationException("Hall not found");
+
             _context.Halls.Remove(hall);
         }
 
-        public void DeleteSeat(Seat seat)
+        public async Task DeleteSeat(Guid id)
         {
+            var seat = await _context.Seats.FindAsync(id);
+
+            if (seat == null)
+                throw new InvalidOperationException("Seat not found");
+                
             _context.Seats.Remove(seat);
         }
 
-        public void EditHall(Hall hall)
+        public async Task<Hall> EditHall(UpdateHallDto input, Guid id)
         {
+            var hall = await _context.Halls.FindAsync(id); 
+            
+            if (hall == null)
+                throw new Exception("Hall not found");
+            
+            // update hall entity
+            if (input.Name != null)
+                hall.Name = input.Name;
+            if (input.NumRows != null)
+                hall.NumRows = input.NumRows.Value;
+            if (input.NumColumns != null)
+                hall.NumColumns = input.NumColumns.Value;
+            if (input.HallType != null)
+                hall.HallType = input.HallType.Value;
+
             _context.Halls.Update(hall);
+            return hall;
         }
 
-        public void EditSeat(Seat seat)
+        public async Task<Seat> EditSeat(UpdateSeatDto input, Guid id)
         {
+            var seat = await _context.Seats.FindAsync(id);
+
+            if (seat == null)
+                throw new Exception("Seat does not exist");
+
+            // update seat entity
+            if (input.Row != null)
+                seat.Row = input.Row.Value;
+            if (input.Column != null)
+                seat.Column = input.Column.Value;
+            if (input.IsFunctional != null)
+                seat.IsFunctional = input.IsFunctional.Value;
+            if (input.SeatType != null)
+                seat.SeatType = input.SeatType.Value;
+
             _context.Seats.Update(seat);
+            return seat;
         }
 
         public async Task<bool> SaveChangesAsync()
