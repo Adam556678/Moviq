@@ -32,13 +32,7 @@ namespace TheaterService.Data
             if (hall == null)
                 throw new Exception("Hall doesn't exist");
 
-            // check if position already exists
-            if (hall.Seats.Any(s => s.Row == seat.Row && s.Column == seat.Column))
-                throw new Exception("Seat in this place already exists");
-
-            // if rows/columns greater than hall's rows/columns, throw an exception
-            if (seat.Column > hall.NumColumns || seat.Row > hall.NumRows)
-                throw new Exception("Invalid seat position");
+            hall.ValidateSeatPosition(seat.Row, seat.Column);
 
             await _context.Seats.AddAsync(seat);
         }
@@ -86,16 +80,22 @@ namespace TheaterService.Data
 
         public async Task<Seat> EditSeat(UpdateSeatDto input, Guid id)
         {
-            var seat = await _context.Seats.FindAsync(id);
+            var seat = await _context.Seats
+                .Include(s => s.Hall)
+                    .ThenInclude(h => h.Seats)
+                .FirstOrDefaultAsync(s => s.Id == id);
 
             if (seat == null)
                 throw new Exception("Seat does not exist");
 
+            var newRow = input.Row ?? seat.Row;
+            var newColumn = input.Column ?? seat.Column;
+
+            seat.Hall.ValidateSeatPosition(newRow, newColumn);
+
             // update seat entity
-            if (input.Row != null)
-                seat.Row = input.Row.Value;
-            if (input.Column != null)
-                seat.Column = input.Column.Value;
+            seat.Row = newRow;
+            seat.Column = newColumn;
             if (input.IsFunctional != null)
                 seat.IsFunctional = input.IsFunctional.Value;
             if (input.SeatType != null)

@@ -23,7 +23,7 @@ namespace TheaterService.Models
             // Initialization logic
             for (int row = 1; row <= NumRows; row++)
             {
-                for (int col = 0; col <= NumColumns; col++)
+                for (int col = 1; col <= NumColumns; col++)
                 {
                     Seats.Add(new Seat
                     {
@@ -32,6 +32,18 @@ namespace TheaterService.Models
                     });
                 }
             }
+        }
+
+        public void ValidateSeatPosition(int row, int column)
+        {
+            if (Seats.Any(s => s.Row == row && s.Column == column))
+                throw new Exception("Seat in this place already exists");
+
+            if (column > NumColumns 
+                || row > NumRows
+                || row < 0
+                || column < 0)
+                throw new Exception("Invalid seat position");
         }
 
     }
