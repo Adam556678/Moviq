@@ -105,6 +105,15 @@ namespace TheaterService.Data
             return seat;
         }
 
+        public async Task<IEnumerable<Hall>> GetAllHallsAsync()
+        {
+            var halls = await _context.Halls
+                .Include(h => h.Seats)
+                .ToListAsync();
+
+            return halls;
+        }
+
         public async Task<bool> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync() > 0;

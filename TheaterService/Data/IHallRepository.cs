@@ -5,6 +5,9 @@ namespace TheaterService.Data
 {
     public interface IHallRepository
     {
+
+        Task<IEnumerable<Hall>> GetAllHallsAsync();
+
         Task AddHallAsync(Hall hall);
 
         Task<Hall> EditHall(UpdateHallDto input, Guid id);

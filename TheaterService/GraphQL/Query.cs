@@ -1,10 +1,16 @@
+using TheaterService.Data;
+using TheaterService.Models;
+
 namespace TheaterService.GraphQL
 {
     public class Query
     {
-        public string GetHalls()
+        public async Task<IEnumerable<Hall>> GetAllHalls(
+            [Service] IHallRepository hallRepository
+        )
         {
-            return "query fetched";
-        }
+            var halls = await hallRepository.GetAllHallsAsync();
+            return halls;
+        } 
     }
 }
