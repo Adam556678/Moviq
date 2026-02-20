@@ -23,7 +23,7 @@ namespace TheaterService.Models
             // Initialization logic
             for (int row = 1; row <= NumRows; row++)
             {
-                for (int col = 0; col < NumColumns; col++)
+                for (int col = 0; col <= NumColumns; col++)
                 {
                     Seats.Add(new Seat
                     {
