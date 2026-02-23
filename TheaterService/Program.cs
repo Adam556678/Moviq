@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TheaterService.Data;
+using TheaterService.GraphQL;
 using TheaterService.Services;
 using TheaterService.Services.AsyncDataService;
 
@@ -26,8 +27,10 @@ builder.Services
         opt.IncludeExceptionDetails = true;
     })
     .AddAuthorization()
-    .AddQueryType<TheaterService.GraphQL.Query>()
-    .AddMutationType<TheaterService.GraphQL.Mutation>()
+    .AddQueryType<Query>()
+    .AddMutationType<Mutation>()
+    .AddTypeExtension<HallMutation>()
+    .AddTypeExtension<ShowtimeMutation>()
     .AddProjections()
     .AddFiltering()
     .AddSorting();

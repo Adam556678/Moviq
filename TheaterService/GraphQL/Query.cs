@@ -12,5 +12,13 @@ namespace TheaterService.GraphQL
             var halls = await hallRepository.GetAllHallsAsync();
             return halls;
         } 
+        public async Task<IEnumerable<Showtime>> GetAllShowimes(
+            [Service] IShowtimeRepository showtimeRepository
+        )
+        {
+            var showtimes = await showtimeRepository.GetAllShowtimesAsync();
+            return showtimes;
+        }
     }
+
 }

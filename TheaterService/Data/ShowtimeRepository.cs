@@ -63,6 +63,7 @@ namespace TheaterService.Data
         {
             var showtimes = await _context.Showtimes
                 .Include(s => s.Hall)
+                .Include(s => s.SeatStates)
                 .ToListAsync();
             
             return showtimes;
