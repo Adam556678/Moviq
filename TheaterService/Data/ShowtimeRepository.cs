@@ -1,4 +1,6 @@
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using TheaterService.DTOs;
 using TheaterService.Models;
 using TheaterService.Services;
 
@@ -43,6 +45,10 @@ namespace TheaterService.Data
             showtime.Id = Guid.NewGuid();
             showtime.Hall = hall;
 
+            // Load movie and add it to showtime entity
+            var movie = await _movieService.GetMovieByIdAsync(showtime.MovieId);
+            showtime.Movie = movie;
+
             // Initialize showtime seats
             _showtimeSeatService.InitializeSeatsForShowtime(showtime);
 
@@ -50,11 +56,11 @@ namespace TheaterService.Data
             await _context.Showtimes.AddAsync(showtime);
         }
 
-        public async Task DeleteShowtimeAsync(Showtime showtime)
+        public async Task DeleteShowtimeAsync(Guid id)
         {
-            var existing = await _context.Showtimes.FindAsync(showtime.Id);
+            var showtime = await _context.Showtimes.FindAsync(id);
 
-            if (existing != null){
+            if (showtime != null){
                 _context.Showtimes.Remove(showtime);
             }
         }
@@ -69,8 +75,19 @@ namespace TheaterService.Data
             return showtimes;
         }
 
-        public void UpdateShowtime(Showtime showtime)
+        public async Task UpdateShowtimeAsync(UpdateShowtimeDto updateShowtimeDto, Guid id)
         {
+            var showtime = await _context.Showtimes.FindAsync(id);
+            if (showtime == null)
+                throw new InvalidOperationException("Showtime does not exist");
+
+            if (updateShowtimeDto.HallId != null)
+                showtime.HallId = updateShowtimeDto.HallId.Value;
+            if (updateShowtimeDto.MovieId != null)
+                showtime.MovieId = updateShowtimeDto.MovieId.Value;
+            if (updateShowtimeDto.StartTime != null)
+                showtime.StartTime = updateShowtimeDto.StartTime.Value;
+
             _context.Showtimes.Update(showtime);
         }
 

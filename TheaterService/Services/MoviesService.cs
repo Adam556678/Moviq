@@ -18,8 +18,10 @@ namespace TheaterService.Services
 
         public async Task AddMovieAsync(Movie movie)
         {
-            if (!_context.Movies.Any(m => m.Id == movie.Id))
+            if (!_context.Movies.Any(m => m.Id == movie.Id)){
                 await _context.Movies.AddAsync(movie);
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task DeleteMovieAsync(Movie movie)
@@ -28,7 +30,17 @@ namespace TheaterService.Services
             if (existing != null)
             {
                 _context.Movies.Remove(existing);
+                await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task<Movie> GetMovieByIdAsync(Guid id)
+        {
+            var movie = await _context.Movies.FindAsync(id);
+            if (movie == null)
+                throw new Exception("Movie does not exist");
+            
+            return movie;
         }
 
         public async Task<bool> IsMovieExistAsync(Guid id)
@@ -36,9 +48,5 @@ namespace TheaterService.Services
             return await _context.Movies.AnyAsync(m => m.Id == id);
         }
 
-        public async Task<bool> SaveChangesAsync()
-        {
-            return await _context.SaveChangesAsync() > 0;
-        }
     }
 }

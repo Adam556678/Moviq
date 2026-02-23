@@ -1,3 +1,4 @@
+using TheaterService.DTOs;
 using TheaterService.Models;
 
 namespace TheaterService.Data
@@ -8,9 +9,9 @@ namespace TheaterService.Data
 
         Task<IEnumerable<Showtime>> GetAllShowtimesAsync();
 
-        void UpdateShowtime(Showtime showtime);
+        Task UpdateShowtimeAsync(UpdateShowtimeDto updateShowtimeDto, Guid id);
 
-        Task DeleteShowtimeAsync(Showtime showtime);
+        Task DeleteShowtimeAsync(Guid id);
 
         Task<bool> SaveChangesAsync();
 

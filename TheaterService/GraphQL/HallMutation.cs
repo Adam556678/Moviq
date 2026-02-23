@@ -4,6 +4,7 @@ using TheaterService.Models;
 
 namespace TheaterService.GraphQL
 {
+    [ExtendObjectType(typeof(Mutation))]
     public class HallMutation
     {
         public async Task<Hall> AddHall(

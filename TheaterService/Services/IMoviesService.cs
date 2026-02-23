@@ -10,7 +10,7 @@ namespace TheaterService.Services
 
         Task<bool> IsMovieExistAsync(Guid id);
 
-        Task<bool> SaveChangesAsync();
-        
+        Task<Movie> GetMovieByIdAsync(Guid id);
+
     }
 }

@@ -35,7 +35,11 @@ namespace TheaterService.Services.AsyncDataService
             _connection = await factory.CreateConnectionAsync();
             _channel = await _connection.CreateChannelAsync();
             
-            await _channel.ExchangeDeclareAsync(exchange: "movies.events", type: ExchangeType.Direct);
+            await _channel.ExchangeDeclareAsync(
+                exchange: "movies.events", 
+                type: ExchangeType.Direct, 
+                durable: true
+            );
 
             await _channel.QueueDeclareAsync(
                 queue: "theater.movies",
