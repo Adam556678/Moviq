@@ -1,3 +1,4 @@
+using HotChocolate.Authorization;
 using TheaterService.Data;
 using TheaterService.DTOs;
 using TheaterService.Models;
@@ -7,6 +8,7 @@ namespace TheaterService.GraphQL
     [ExtendObjectType(typeof(Mutation))]
     public class ShowtimeMutation
     {
+        [Authorize(Roles = new[] {"Admin"})]
         public async Task<Showtime> AddShowtime(
             AddShowtimeDto input,
             [Service] IShowtimeRepository showtimeRepository
@@ -31,6 +33,7 @@ namespace TheaterService.GraphQL
             }
         }
 
+        [Authorize(Roles = new[] {"Admin"})]
         public async Task<bool> DeleteShowtime(
             Guid id,
             [Service] IShowtimeRepository showtimeRepository
@@ -47,7 +50,8 @@ namespace TheaterService.GraphQL
             }
         }
 
-        public async Task UpdateShowtime(
+        [Authorize(Roles = new[] {"Admin"})]
+        public async Task<bool> UpdateShowtime(
             Guid id,
             UpdateShowtimeDto input,
             [Service] IShowtimeRepository showtimeRepository
@@ -57,6 +61,7 @@ namespace TheaterService.GraphQL
             {
                 await showtimeRepository.UpdateShowtimeAsync(input, id);
                 await showtimeRepository.SaveChangesAsync();
+                return true;
             }
             catch (Exception e)
             {

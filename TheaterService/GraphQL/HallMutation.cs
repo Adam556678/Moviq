@@ -1,3 +1,4 @@
+using HotChocolate.Authorization;
 using TheaterService.Data;
 using TheaterService.DTOs;
 using TheaterService.Models;
@@ -7,6 +8,7 @@ namespace TheaterService.GraphQL
     [ExtendObjectType(typeof(Mutation))]
     public class HallMutation
     {
+        [Authorize(Roles = new[] {"Admin"})]
         public async Task<Hall> AddHall(
             AddHallDto input,
             [Service] IHallRepository hallRepository
@@ -38,6 +40,7 @@ namespace TheaterService.GraphQL
             return hall;
         }
 
+        [Authorize(Roles = new[] {"Admin"})]
         public async Task<Seat> AddSeat(
             AddSeatDto input,
             [Service] IHallRepository hallRepository
@@ -65,6 +68,7 @@ namespace TheaterService.GraphQL
             return seat;
         }
 
+        [Authorize(Roles = new[] {"Admin"})]
         public async Task<bool> DeleteHall(
             Guid HallId,
             [Service] IHallRepository hallRepository
@@ -83,6 +87,7 @@ namespace TheaterService.GraphQL
             return true;
         }
 
+        [Authorize(Roles = new[] {"Admin"})]
         public async Task<bool> DeleteSeat(
             Guid seatId,
             [Service] IHallRepository hallRepository
@@ -101,6 +106,7 @@ namespace TheaterService.GraphQL
             return true;
         }
 
+        [Authorize(Roles = new[] {"Admin"})]
         public async Task<Hall> UpdateHall(
             Guid id,
             UpdateHallDto input,
@@ -118,7 +124,8 @@ namespace TheaterService.GraphQL
                 throw new GraphQLException(e.Message);
             }
         }
-
+        
+        [Authorize(Roles = new[] {"Admin"})]
         public async Task<Seat> UpdateSeat(
             Guid id,
             UpdateSeatDto input,
