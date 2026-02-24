@@ -6,6 +6,7 @@ using TheaterService.Data;
 using TheaterService.GraphQL;
 using TheaterService.Services;
 using TheaterService.Services.AsyncDataService;
+using TheaterService.Services.Caching;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,13 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<AppDbContext>(options => 
     options.UseNpgsql(builder.Configuration.GetConnectionString("TheaterConn")));
+
+// Caching config
+builder.Services.AddStackExchangeRedisCache(option =>
+{
+ option.Configuration = builder.Configuration.GetConnectionString("Redis");   
+ option.InstanceName = "showtimes_";
+});
 
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -51,10 +59,6 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<IMoviesService, MoviesService>();
 builder.Services.AddHostedService<EventBusSubscriber>();
 
-builder.Services.AddScoped<IHallRepository, HallRepository>();
-builder.Services.AddScoped<IShowtimeSeatService, ShowtimeSeatService>();
-builder.Services.AddScoped<IShowtimeRepository, ShowtimeRepository>();
-
 builder.Services
     .AddGraphQLServer()
     .ModifyRequestOptions(opt =>
@@ -69,6 +73,11 @@ builder.Services
     .AddProjections()
     .AddFiltering()
     .AddSorting();
+
+builder.Services.AddScoped<IRedisCacheService, RedisCacheService>();
+builder.Services.AddScoped<IHallRepository, HallRepository>();
+builder.Services.AddScoped<IShowtimeSeatService, ShowtimeSeatService>();
+builder.Services.AddScoped<IShowtimeRepository, ShowtimeRepository>();
 
 var app = builder.Build();
 
