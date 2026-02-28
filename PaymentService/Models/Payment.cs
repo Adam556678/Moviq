@@ -6,11 +6,12 @@ namespace PaymentService.Models
 
         public Guid ReservationId { get; set; }
 
-        public Guid? StripeSessionId { get; set; } // The UI ID
-        public Guid? StripePaymentIntentId { get; set; } // The Money ID
+        public string? StripeSessionId { get; set; } // The UI ID
+        public string? StripePaymentIntentId { get; set; } // The Money ID
 
-        public decimal Amount { get; set; }
-        public string Currency { get; set; } = "USD";
+        public decimal Price { get; set; }
+        public string Currency { get; set; } = "usd";
+        public int Quantity { get; set; }
 
         public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
 
@@ -21,6 +22,7 @@ namespace PaymentService.Models
     {
         Pending,
         Succeeded,
-        Failed
+        Failed,
+        Refunded
     }
 }

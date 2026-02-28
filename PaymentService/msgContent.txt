@@ -1,0 +1,8 @@
+- Price
+- ReservationId
+- Currency
+- Quantity
+- Prodcuct Data{
+    movie name
+    showtime start
+}
