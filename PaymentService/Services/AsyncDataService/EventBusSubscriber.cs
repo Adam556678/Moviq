@@ -1,6 +1,8 @@
 
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using PaymentService.Services.Events;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
@@ -72,9 +74,28 @@ namespace PaymentService.Services.AsyncDataService
 
                 Console.WriteLine($"Event received: {routingKey}");
 
-                // if (routingKey == "reservation.created")
+                if (routingKey == "reservation.created")
+                {
+                    var reservationCreatedEvent = JsonSerializer
+                        .Deserialize<ReservationCreatedEvent>(body);
 
+                    if (reservationCreatedEvent == null)
+                        throw new InvalidOperationException("Event deserialization failed");
+
+                    // Create payment session and save to DB
+                    await paymentService.CreateCheckoutSessionAsync(reservationCreatedEvent);
+                    await paymentService.SavePaymentAsync(reservationCreatedEvent);
+                }
+
+                // message processed, delete from queue
+                await _channel!.BasicAckAsync(args.DeliveryTag, multiple: false);
             };
+
+            await _channel!.BasicConsumeAsync(
+                queue: "reservation.payments",
+                autoAck: false,
+                consumer: consumer
+            );
 
         }
     }
