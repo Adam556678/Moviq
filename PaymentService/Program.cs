@@ -3,6 +3,7 @@ using PaymentService.Data;
 using PaymentService.Services;
 using PaymentService.Services.AsyncDataService;
 using Stripe;
+using Stripe.Checkout;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,8 +12,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<AppDbContext>(options => 
-    options.UseNpgsql(builder.Configuration.GetConnectionString("TheaterConn")));
-
+    options.UseNpgsql(builder.Configuration.GetConnectionString("PaymentConn")));
+    
+builder.Services.AddScoped<SessionService>();
 StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
 builder.Services.AddScoped<IPaymentsService, StripePaymentService>();

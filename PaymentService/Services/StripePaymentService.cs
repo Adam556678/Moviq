@@ -1,4 +1,5 @@
 
+using Microsoft.EntityFrameworkCore;
 using PaymentService.Data;
 using PaymentService.Models;
 using PaymentService.Services.Events;
@@ -71,7 +72,7 @@ namespace PaymentService.Services
                     }
                 },
                 Mode = "payment",
-                // Pass the ReservationId in Metadata so Webhooks can find it later!
+                // Pass the ReservationId in Metadata so Webhooks can find it later
                 Metadata = new Dictionary<string, string> { { "reservationId", createdEvent.ReservationId.ToString() } },
                 SuccessUrl = _configuration["Stripe:SuccessURL"] + $"?id={createdEvent.ReservationId}",
                 CancelUrl = _configuration["Stripe:CancelURL"]
@@ -80,6 +81,19 @@ namespace PaymentService.Services
             // Create Stripe session and return it
             var session = await _stripeSessionService.CreateAsync(options);
             return session;
+        }
+
+        public async Task UpdatePaymentStatusAsync(Guid reservationId, PaymentStatus status)
+        {
+            var payment = await _context.Payments
+                .FirstOrDefaultAsync(p => p.ReservationId == reservationId);
+            
+            if (payment == null)
+                throw new Exception("Payment with this reservation id not found");
+            
+            // update status & save db
+            payment.Status = status;
+            await _context.SaveChangesAsync();
         }
     }
 }
