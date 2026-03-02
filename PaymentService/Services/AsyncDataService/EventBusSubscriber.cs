@@ -83,8 +83,8 @@ namespace PaymentService.Services.AsyncDataService
                         throw new InvalidOperationException("Event deserialization failed");
 
                     // Create payment session and save to DB
-                    await paymentService.CreateCheckoutSessionAsync(reservationCreatedEvent);
-                    await paymentService.SavePaymentAsync(reservationCreatedEvent);
+                    var session = await paymentService.CreateCheckoutSessionAsync(reservationCreatedEvent);
+                    await paymentService.SavePaymentAsync(reservationCreatedEvent, session);
                 }
 
                 // message processed, delete from queue

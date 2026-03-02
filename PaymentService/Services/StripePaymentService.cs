@@ -12,7 +12,6 @@ namespace PaymentService.Services
         private readonly AppDbContext _context;
         private readonly IConfiguration _configuration;
         private readonly SessionService _stripeSessionService;
-        private Session? _session;
 
         public StripePaymentService(
             AppDbContext context, 
@@ -25,9 +24,12 @@ namespace PaymentService.Services
             _stripeSessionService = stripeSessionService;
         }
 
-        public async Task SavePaymentAsync(ReservationCreatedEvent createdEvent)
+        public async Task SavePaymentAsync(
+            ReservationCreatedEvent createdEvent,
+            Session session
+        )
         {
-            if (_session == null)
+            if (session == null)
                 throw new Exception("Checkout session doesn't exist");
 
             var payment = new Payment
@@ -36,14 +38,15 @@ namespace PaymentService.Services
                 Price = createdEvent.Price,
                 Currency = createdEvent.Currency,
                 Quantity = createdEvent.Quantity,
-                StripeSessionId = _session.Id
+                StripeSessionId = session.Id,
+                StripePaymentIntentId = session.PaymentIntentId
             };
 
             await _context.Payments.AddAsync(payment);
             await _context.SaveChangesAsync();
         }
 
-        public async Task CreateCheckoutSessionAsync(ReservationCreatedEvent createdEvent)
+        public async Task<Session> CreateCheckoutSessionAsync(ReservationCreatedEvent createdEvent)
         {
 
             var showTime = createdEvent.ShowtimeStart.ToString("dd MMM yyyy, HH:mm");
@@ -70,13 +73,13 @@ namespace PaymentService.Services
                 Mode = "payment",
                 // Pass the ReservationId in Metadata so Webhooks can find it later!
                 Metadata = new Dictionary<string, string> { { "reservationId", createdEvent.ReservationId.ToString() } },
-                SuccessUrl = _configuration["Stripe:SuccessURL"],
+                SuccessUrl = _configuration["Stripe:SuccessURL"] + $"?id={createdEvent.ReservationId}",
                 CancelUrl = _configuration["Stripe:CancelURL"]
             };
             
             // Create Stripe session and return it
             var session = await _stripeSessionService.CreateAsync(options);
-            _session = session;
+            return session;
         }
     }
 }

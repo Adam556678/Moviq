@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using PaymentService.Data;
+using PaymentService.Services;
+using PaymentService.Services.AsyncDataService;
+using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +12,12 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<AppDbContext>(options => 
     options.UseNpgsql(builder.Configuration.GetConnectionString("TheaterConn")));
+
+StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
+
+builder.Services.AddScoped<IPaymentsService, StripePaymentService>();
+builder.Services.AddHostedService<EventBusSubscriber>();
+
 
 var app = builder.Build();
 
