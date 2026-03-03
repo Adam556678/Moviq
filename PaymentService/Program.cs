@@ -19,6 +19,7 @@ StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
 builder.Services.AddScoped<IPaymentsService, StripePaymentService>();
 builder.Services.AddHostedService<EventBusSubscriber>();
+builder.Services.AddSingleton<EventBusPublisher>();
 
 
 var app = builder.Build();
