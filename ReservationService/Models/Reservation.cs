@@ -11,7 +11,7 @@ namespace ReservationService.Models
 
         public decimal TotalAmount { get; set; }
 
-        // TODO: list of reservation seats <<<< --
+        public ICollection<ReservationSeat> ReservedSeats { get; set; } = new List<ReservationSeat>();
     }
 
     public enum ReservationStatus
