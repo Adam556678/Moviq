@@ -23,6 +23,7 @@ namespace PaymentService.Models
         Pending,
         Succeeded,
         Failed,
-        Refunded
+        Refunded,
+        Expired
     }
 }
