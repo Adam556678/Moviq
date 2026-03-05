@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using TheaterService.DTOs.PricingDtos;
 using TheaterService.Enums;
 using TheaterService.Models;
 
@@ -58,35 +59,79 @@ namespace TheaterService.Data
         }
 
         // ---------- HallPricing ----------
-        public Task AddHallPricing(HallPricing pricing)
+        public async Task AddHallPricing(HallPricing pricing)
         {
-            throw new NotImplementedException();
+            var hallPricing = await _context.HallPricing
+                .FirstOrDefaultAsync(hp => hp.HallType == pricing.HallType);
+            
+            if (hallPricing != null)
+                throw new Exception("Pricing with this halltype already exists");
+            
+            await _context.HallPricing.AddAsync(pricing);
+            await _context.SaveChangesAsync();
         }
 
-        public Task UpdateHallPricing(HallPricing pricing)
+        public async Task UpdateHallPricing(Guid id, UpdateHallPricingDto pricingDto)
         {
-            throw new NotImplementedException();
+            var existingHallPricing = await _context.HallPricing.
+                FirstOrDefaultAsync(hp => hp.Id == id);
+            if (existingHallPricing == null)
+                throw new Exception("HallPricing with this ID doesn't exist");
+
+            if (pricingDto.HallType != null)
+                existingHallPricing.HallType = pricingDto.HallType.Value;
+            if (pricingDto.Multiplier != null)
+                existingHallPricing.Multiplier = pricingDto.Multiplier.Value;
+
+            _context.HallPricing.Update(existingHallPricing);
+            await _context.SaveChangesAsync();
         }
 
-        public Task RemoveHallPricing(Guid id)
+        public async Task RemoveHallPricing(Guid id)
         {
-            throw new NotImplementedException();
+            var hallPricing = await _context.HallPricing.FindAsync(id);
+            if (hallPricing == null)
+                throw new Exception("HallPricing with this ID doesn't exist");
+
+            _context.HallPricing.Remove(hallPricing);
+            await _context.SaveChangesAsync();
         }
 
         // ---------- SeatPricing ----------
-        public Task AddSeatPricing(SeatPricing pricing)
+        public async Task AddSeatPricing(SeatPricing pricing)
         {
-            throw new NotImplementedException();
+            var seatPricing = await _context.SeatPricing
+                .FirstOrDefaultAsync(sp => sp.SeatType == pricing.SeatType);
+            if (seatPricing != null)
+                throw new Exception("SeatPricing with this seat type already exists");
+
+            await _context.SeatPricing.AddAsync(pricing);
+            await _context.SaveChangesAsync();
         }
 
-        public Task RemoveSeatPricing(Guid id)
+        public async Task RemoveSeatPricing(Guid id)
         {
-            throw new NotImplementedException();
+            var seatPricing = await _context.SeatPricing.FindAsync(id);
+            if (seatPricing == null)
+                throw new Exception("SeatPricing with this id doesn't exist");
+
+            _context.SeatPricing.Remove(seatPricing);
+            await _context.SaveChangesAsync();
         }
 
-        public Task UpdateSeatPricing(SeatPricing pricing)
+        public async Task UpdateSeatPricing(Guid id, UpdateSeatPricingDto seatPricingDto)
         {
-            throw new NotImplementedException();
+            var seatPricing = await _context.SeatPricing.FindAsync(id);
+            if (seatPricing == null)
+                throw new Exception("SeatPricing with this id doesn't exist");
+
+            if (seatPricingDto.SeatType != null)
+                seatPricing.SeatType = seatPricingDto.SeatType.Value;
+            if (seatPricingDto.BasePrice != null)
+                seatPricing.BasePrice = seatPricingDto.BasePrice.Value;
+
+            _context.SeatPricing.Update(seatPricing);
+            await _context.SaveChangesAsync();
         }
 
         // ---------- TimePricing ----------
@@ -100,7 +145,7 @@ namespace TheaterService.Data
             throw new NotImplementedException();
         }
 
-        public Task UpdateTimePricing(TimePricing pricing)
+        public Task UpdateTimePricing(Guid id, UpdateTimePricingDto timePricingDto)
         {
             throw new NotImplementedException();
         }

@@ -1,3 +1,4 @@
+using TheaterService.DTOs.PricingDtos;
 using TheaterService.Enums;
 using TheaterService.Models;
 
@@ -11,17 +12,17 @@ namespace TheaterService.Data
 
         // Seat pricing opertaions
         Task AddSeatPricing(SeatPricing pricing);
-        Task UpdateSeatPricing(SeatPricing pricing);
+        Task UpdateSeatPricing(Guid id, UpdateSeatPricingDto seatPricingDto);
         Task RemoveSeatPricing(Guid id);
 
         // Hall pricing opertaions
         Task AddHallPricing(HallPricing pricing);
-        Task UpdateHallPricing(HallPricing pricing);
+        Task UpdateHallPricing(Guid id, UpdateHallPricingDto pricingDto);
         Task RemoveHallPricing(Guid id);
 
         // Time pricing opertaions
         Task AddTimePricing(TimePricing pricing);
-        Task UpdateTimePricing(TimePricing pricing);
+        Task UpdateTimePricing(Guid id, UpdateTimePricingDto timePricingDto);
         Task RemoveTimePricing(Guid id);
     }
 }
