@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using TheaterService.Enums;
 using TheaterService.Models;
 
@@ -5,20 +6,55 @@ namespace TheaterService.Data
 {
     public class PricingRepository : IPricingRepository
     {
+
+        private readonly AppDbContext _context;
+
+        public PricingRepository(AppDbContext context)
+        {
+            _context = context;
+        }
+
         // ---------- Getters ----------
-        public Task<HallPricing?> GetHallPricingAsync(HallType hallType)
+        public async Task<HallPricing?> GetHallPricingAsync(HallType hallType)
         {
-            throw new NotImplementedException();
+            var pricing = await _context.HallPricing.FirstOrDefaultAsync(
+                p => p.HallType == hallType);
+            
+            if (pricing == null)
+                throw new Exception("Pricing does not exist");
+
+            return pricing;
         }
 
-        public Task<SeatPricing?> GetSeatPricingAsync(SeatType seatType)
+        public async Task<SeatPricing?> GetSeatPricingAsync(SeatType seatType)
         {
-            throw new NotImplementedException();
+            var pricing = await _context.SeatPricing.FirstOrDefaultAsync(
+                p => p.SeatType == seatType
+            );
+
+            if (pricing == null)
+                throw new Exception("Pricing does not exist");
+
+            return pricing;
         }
 
-        public Task<TimePricing?> GetTimePricingAsync(Showtime showtime)
+        public async Task<TimePricing?> GetTimePricingAsync(Showtime showtime)
         {
-            throw new NotImplementedException();
+            // Convert startTime to hours
+            var showtimeTime = showtime.StartTime.TimeOfDay;
+
+            var rules = await _context.TimePricing.ToListAsync();
+            
+            // return time pricing of this start time
+            return rules.FirstOrDefault(r => 
+            (r.StartHour <= r.EndHour &&
+                r.StartHour <= showtimeTime && 
+                r.EndHour > showtimeTime)
+            ||
+            (r.StartHour > r.EndHour &&
+                (r.StartHour <= showtimeTime || 
+                r.EndHour > showtimeTime))
+            );
         }
 
         // ---------- HallPricing ----------

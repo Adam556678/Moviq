@@ -4,8 +4,8 @@ namespace TheaterService.Models
     {
         public Guid Id { get; set; }
 
-        public required string StartHour { get; set; }
-        public required string EndHour { get; set; }
+        public TimeSpan StartHour { get; set; }
+        public TimeSpan EndHour { get; set; }
 
         public decimal Multiplier { get; set; }
     }

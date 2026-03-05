@@ -215,16 +215,14 @@ namespace TheaterService.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("EndHour")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<TimeSpan>("EndHour")
+                        .HasColumnType("interval");
 
                     b.Property<decimal>("Multiplier")
                         .HasColumnType("numeric");
 
-                    b.Property<string>("StartHour")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<TimeSpan>("StartHour")
+                        .HasColumnType("interval");
 
                     b.HasKey("Id");
 

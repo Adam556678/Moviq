@@ -12,8 +12,8 @@ using TheaterService.Data;
 namespace TheaterService.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260219110841_AddShowtimeSeat")]
-    partial class AddShowtimeSeat
+    [Migration("20260305164511_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -49,6 +49,23 @@ namespace TheaterService.Migrations
                     b.ToTable("Halls");
                 });
 
+            modelBuilder.Entity("TheaterService.Models.HallPricing", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("HallType")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("Multiplier")
+                        .HasColumnType("numeric");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("HallPricing");
+                });
+
             modelBuilder.Entity("TheaterService.Models.Movie", b =>
                 {
                     b.Property<Guid>("Id")
@@ -73,6 +90,9 @@ namespace TheaterService.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Currency")
                         .IsRequired()
                         .HasMaxLength(5)
@@ -81,21 +101,17 @@ namespace TheaterService.Migrations
                     b.Property<int>("HallType")
                         .HasColumnType("integer");
 
-                    b.Property<int>("SeatType")
-                        .HasColumnType("integer");
-
                     b.Property<Guid>("ShowtimeId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("ValidFrom")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("ValidTo")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<Guid>("ShowtimeSeatId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ShowtimeId");
+
+                    b.HasIndex("ShowtimeSeatId");
 
                     b.ToTable("Prices");
                 });
@@ -126,6 +142,23 @@ namespace TheaterService.Migrations
                     b.HasIndex("HallId");
 
                     b.ToTable("Seats");
+                });
+
+            modelBuilder.Entity("TheaterService.Models.SeatPricing", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("BasePrice")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("SeatType")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SeatPricing");
                 });
 
             modelBuilder.Entity("TheaterService.Models.Showtime", b =>
@@ -179,6 +212,26 @@ namespace TheaterService.Migrations
                     b.ToTable("ShowtimeSeats");
                 });
 
+            modelBuilder.Entity("TheaterService.Models.TimePricing", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<TimeSpan>("EndHour")
+                        .HasColumnType("interval");
+
+                    b.Property<decimal>("Multiplier")
+                        .HasColumnType("numeric");
+
+                    b.Property<TimeSpan>("StartHour")
+                        .HasColumnType("interval");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TimePricing");
+                });
+
             modelBuilder.Entity("TheaterService.Models.Price", b =>
                 {
                     b.HasOne("TheaterService.Models.Showtime", "Showtime")
@@ -187,7 +240,15 @@ namespace TheaterService.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("TheaterService.Models.ShowtimeSeat", "ShowtimeSeat")
+                        .WithMany()
+                        .HasForeignKey("ShowtimeSeatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Showtime");
+
+                    b.Navigation("ShowtimeSeat");
                 });
 
             modelBuilder.Entity("TheaterService.Models.Seat", b =>
