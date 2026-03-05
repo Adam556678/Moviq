@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TheaterService.Data;
@@ -11,9 +12,11 @@ using TheaterService.Data;
 namespace TheaterService.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260305051125_EditPriceModel")]
+    partial class EditPriceModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,23 +47,6 @@ namespace TheaterService.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Halls");
-                });
-
-            modelBuilder.Entity("TheaterService.Models.HallPricing", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("HallType")
-                        .HasColumnType("integer");
-
-                    b.Property<decimal>("Multiplier")
-                        .HasColumnType("numeric");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("HallPricing");
                 });
 
             modelBuilder.Entity("TheaterService.Models.Movie", b =>
@@ -141,23 +127,6 @@ namespace TheaterService.Migrations
                     b.ToTable("Seats");
                 });
 
-            modelBuilder.Entity("TheaterService.Models.SeatPricing", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("BasePrice")
-                        .HasColumnType("numeric");
-
-                    b.Property<int>("SeatType")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SeatPricing");
-                });
-
             modelBuilder.Entity("TheaterService.Models.Showtime", b =>
                 {
                     b.Property<Guid>("Id")
@@ -207,28 +176,6 @@ namespace TheaterService.Migrations
                     b.HasIndex("ShowtimeId");
 
                     b.ToTable("ShowtimeSeats");
-                });
-
-            modelBuilder.Entity("TheaterService.Models.TimePricing", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("EndHour")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<decimal>("Multiplier")
-                        .HasColumnType("numeric");
-
-                    b.Property<string>("StartHour")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TimePricing");
                 });
 
             modelBuilder.Entity("TheaterService.Models.Price", b =>

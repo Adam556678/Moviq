@@ -95,5 +95,6 @@ namespace TheaterService.Data
         {
             return await _context.SaveChangesAsync() > 0;
         }
+
     }
 }

@@ -17,7 +17,10 @@ namespace TheaterService.Models
         public virtual Showtime Showtime { get; set; } = default!;
 
         [Required]
-        public required SeatType SeatType { get; set; }
+        public required Guid ShowtimeSeatId { get; set; }
+
+        [ForeignKey("ShowtimeSeatId")]
+        public ShowtimeSeat ShowtimeSeat { get; set; } = default!;
 
         [Required]
         public required HallType HallType { get; set; }
@@ -28,8 +31,6 @@ namespace TheaterService.Models
         [MaxLength(5)]
         public string Currency { get; set; } = "USD";
 
-        public DateTime ValidFrom { get; set; }
-
-        public DateTime ValidTo { get; set; } 
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }
