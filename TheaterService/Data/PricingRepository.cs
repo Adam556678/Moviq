@@ -135,9 +135,31 @@ namespace TheaterService.Data
         }
 
         // ---------- TimePricing ----------
-        public Task AddTimePricing(TimePricing pricing)
+        public async Task AddTimePricing(TimePricing pricing)
         {
-            throw new NotImplementedException();
+            var existingPricings = await _context.TimePricing.ToListAsync();
+            var newIntervals = Normalize(pricing.StartHour, pricing.EndHour);
+
+            foreach (var tp in existingPricings)
+            {
+                var existingIntervals = Normalize(tp.StartHour, tp.EndHour);
+
+                foreach (var newInterval in newIntervals)
+                {
+                    foreach (var existingInterval in existingIntervals)
+                    {
+                        if (Overlaps(
+                            newInterval.Start, newInterval.End,
+                            existingInterval.Start, existingInterval.End))
+                        {
+                            throw new Exception("Time pricing interval overlaps with an existing one.");
+                        }
+                    }
+                }
+            }
+
+            await _context.TimePricing.AddAsync(pricing);
+            await _context.SaveChangesAsync();
         }
 
         public Task RemoveTimePricing(Guid id)
@@ -149,5 +171,27 @@ namespace TheaterService.Data
         {
             throw new NotImplementedException();
         }
+
+        private List<(TimeSpan Start, TimeSpan End)> Normalize(TimeSpan start, TimeSpan end)
+        {
+            if (start < end)
+            {
+                return new() {(start, end)};
+            }
+
+            // crosses midnight
+            return new()
+            {
+                (start, TimeSpan.FromHours(24)),
+                (TimeSpan.Zero, end)
+            }; 
+        }
+
+        private bool Overlaps(TimeSpan s1, TimeSpan e1, TimeSpan s2, TimeSpan e2)
+        {
+            return s1 < e2 && s2 < e1;
+        }
+
+
     }
 }
