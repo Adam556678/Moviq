@@ -70,12 +70,14 @@ builder.Services
     .AddMutationType<Mutation>()
     .AddTypeExtension<HallMutation>()
     .AddTypeExtension<ShowtimeMutation>()
+    .AddTypeExtension<PricingMutation>()
     .AddProjections()
     .AddFiltering()
     .AddSorting();
 
 builder.Services.AddScoped<IRedisCacheService, RedisCacheService>();
 builder.Services.AddScoped<IHallRepository, HallRepository>();
+builder.Services.AddScoped<IPricingRepository, PricingRepository>();
 builder.Services.AddScoped<IShowtimeSeatService, ShowtimeSeatService>();
 builder.Services.AddScoped<IShowtimeRepository, ShowtimeRepository>();
 

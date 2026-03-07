@@ -1,5 +1,6 @@
 using TheaterService.Data;
 using TheaterService.DTOs;
+using TheaterService.Enums;
 using TheaterService.Models;
 using TheaterService.Services.Caching;
 
@@ -58,6 +59,49 @@ namespace TheaterService.GraphQL
 
             return showtimeDtos;
         }
-    }
 
+         // ---------- Pricing ----------
+
+        public async Task<HallPricing?> GetHallPricing(
+            HallType hallType,
+            [Service] IPricingRepository pricingRepository)
+        {
+            try
+            {
+                return await pricingRepository.GetHallPricingAsync(hallType);
+            }
+            catch (Exception e)
+            {
+                throw new GraphQLException($"Couldn't fetch hall pricing: {e.Message}");
+            }
+        }
+
+        public async Task<SeatPricing?> GetSeatPricing(
+            SeatType seatType,
+            [Service] IPricingRepository pricingRepository)
+        {
+            try
+            {
+                return await pricingRepository.GetSeatPricingAsync(seatType);
+            }
+            catch (Exception e)
+            {
+                throw new GraphQLException($"Couldn't fetch seat pricing: {e.Message}");
+            }
+        }
+
+        public async Task<TimePricing?> GetTimePricing(
+            Showtime showtime,
+            [Service] IPricingRepository pricingRepository)
+        {
+            try
+            {
+                return await pricingRepository.GetTimePricingAsync(showtime);
+            }
+            catch (Exception e)
+            {
+                throw new GraphQLException($"Couldn't fetch time pricing: {e.Message}");
+            }
+        }
+    }
 }
