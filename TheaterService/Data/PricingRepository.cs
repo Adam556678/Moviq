@@ -162,14 +162,31 @@ namespace TheaterService.Data
             await _context.SaveChangesAsync();
         }
 
-        public Task RemoveTimePricing(Guid id)
+        public async Task RemoveTimePricing(Guid id)
         {
-            throw new NotImplementedException();
+            var pricing = await _context.TimePricing.FindAsync(id);
+            if (pricing == null)
+                throw new Exception("TimePricing with this ID does not exist");
+            
+            _context.TimePricing.Remove(pricing);
+            await _context.SaveChangesAsync();
         }
 
-        public Task UpdateTimePricing(Guid id, UpdateTimePricingDto timePricingDto)
+        public async Task UpdateTimePricing(Guid id, UpdateTimePricingDto timePricingDto)
         {
-            throw new NotImplementedException();
+            var pricing = await _context.TimePricing.FindAsync(id);
+            if (pricing == null)
+                throw new Exception("Pricing does not exist");
+
+            if (timePricingDto.StartHour != null)
+                pricing.StartHour = timePricingDto.StartHour.Value;
+            if (timePricingDto.EndHour != null)
+                pricing.EndHour = timePricingDto.EndHour.Value;
+            if (timePricingDto.Multiplier != null)
+                pricing.Multiplier = timePricingDto.Multiplier.Value;
+            
+            _context.TimePricing.Update(pricing);
+            await _context.SaveChangesAsync();
         }
 
         private List<(TimeSpan Start, TimeSpan End)> Normalize(TimeSpan start, TimeSpan end)
@@ -191,7 +208,5 @@ namespace TheaterService.Data
         {
             return s1 < e2 && s2 < e1;
         }
-
-
     }
 }
