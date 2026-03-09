@@ -1,3 +1,4 @@
+using HotChocolate.Authorization;
 using TheaterService.Data;
 using TheaterService.DTOs.PricingDtos;
 using TheaterService.Models;
@@ -8,6 +9,7 @@ namespace TheaterService.GraphQL
     {
 
         // --------------- Hall Pricing ---------------
+        [Authorize(Roles = new[] {"Admin"})]
         public async Task AddHallPricing(
             AddHallPricingDto pricingDto,
             [Service] IPricingRepository pricingRepository
@@ -30,6 +32,7 @@ namespace TheaterService.GraphQL
             }
         }
 
+        [Authorize(Roles = new[] {"Admin"})]
         public async Task UpdateHallPricing(
             Guid id,
             UpdateHallPricingDto pricingDto,
@@ -45,6 +48,7 @@ namespace TheaterService.GraphQL
             }
         }
 
+        [Authorize(Roles = new[] {"Admin"})]
         public async Task RemoveHallPricing(
             Guid id,
             [Service] IPricingRepository pricingRepository)
@@ -61,6 +65,7 @@ namespace TheaterService.GraphQL
 
         // ---------- SeatPricing ----------
 
+        [Authorize(Roles = new[] {"Admin"})]
         public async Task AddSeatPricing(
             AddSeatPricingDto seatPricingDto,
             [Service] IPricingRepository pricingRepository)
@@ -83,6 +88,7 @@ namespace TheaterService.GraphQL
             }
         }
 
+        [Authorize(Roles = new[] {"Admin"})]
         public async Task UpdateSeatPricing(
             Guid id,
             UpdateSeatPricingDto seatPricingDto,
@@ -98,6 +104,7 @@ namespace TheaterService.GraphQL
             }
         }
 
+        [Authorize(Roles = new[] {"Admin"})]
         public async Task RemoveSeatPricing(
             Guid id,
             [Service] IPricingRepository pricingRepository)
@@ -114,6 +121,7 @@ namespace TheaterService.GraphQL
 
         // ---------- TimePricing ----------
 
+        [Authorize(Roles = new[] {"Admin"})]
         public async Task AddTimePricing(
             AddTimePricingDto timePricingDto,
             [Service] IPricingRepository pricingRepository)
@@ -134,7 +142,8 @@ namespace TheaterService.GraphQL
                 throw new GraphQLException($"Couldn't add time pricing: {e.Message}");
             }
         }
-
+        
+        [Authorize(Roles = new[] {"Admin"})]
         public async Task UpdateTimePricing(
             Guid id,
             UpdateTimePricingDto timePricingDto,
@@ -150,6 +159,7 @@ namespace TheaterService.GraphQL
             }
         }
 
+        [Authorize(Roles = new[] {"Admin"})]
         public async Task RemoveTimePricing(
             Guid id,
             [Service] IPricingRepository pricingRepository)

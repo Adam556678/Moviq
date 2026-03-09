@@ -58,6 +58,15 @@ namespace TheaterService.Data
             );
         }
 
+        public async Task<IEnumerable<SeatPricing>> GetAllSeatPricingsAsync()
+        {
+            var seatPricings = await _context.SeatPricing.ToListAsync();
+            if (seatPricings == null)
+                throw new Exception("Seat pricings does not exist");
+                
+            return seatPricings;
+        }
+
         // ---------- HallPricing ----------
         public async Task AddHallPricing(HallPricing pricing)
         {
@@ -208,5 +217,6 @@ namespace TheaterService.Data
         {
             return s1 < e2 && s2 < e1;
         }
+
     }
 }

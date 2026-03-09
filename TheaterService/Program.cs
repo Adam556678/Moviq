@@ -58,6 +58,7 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<IMoviesService, MoviesService>();
 builder.Services.AddHostedService<EventBusSubscriber>();
+builder.Services.AddSingleton<IEventBusPublisher, EventBusPublisher>();
 
 builder.Services
     .AddGraphQLServer()
@@ -80,6 +81,8 @@ builder.Services.AddScoped<IHallRepository, HallRepository>();
 builder.Services.AddScoped<IPricingRepository, PricingRepository>();
 builder.Services.AddScoped<IShowtimeSeatService, ShowtimeSeatService>();
 builder.Services.AddScoped<IShowtimeRepository, ShowtimeRepository>();
+builder.Services.AddScoped<IPricingService, PricingService>();
+
 
 var app = builder.Build();
 

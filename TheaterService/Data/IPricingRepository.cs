@@ -7,6 +7,7 @@ namespace TheaterService.Data
     public interface IPricingRepository
     {
         Task<SeatPricing?> GetSeatPricingAsync(SeatType seatType);
+        Task<IEnumerable<SeatPricing>> GetAllSeatPricingsAsync();
         Task<HallPricing?> GetHallPricingAsync(HallType hallType);
         Task<TimePricing?> GetTimePricingAsync(Showtime showtime);
 
