@@ -18,14 +18,25 @@ namespace TheaterService.Services.AsyncDataService
             _configuration = configuration;
             _factory = new ConnectionFactory()
             {
-                HostName = configuration["RabbitMQHost"] ?? "localhost",
-                Port = int.Parse(configuration["RabbitMQPort"] ?? "5672")
+                HostName = _configuration["RabbitMQHost"] ?? "localhost",
+                Port = int.Parse(_configuration["RabbitMQPort"] ?? "5672")
             };
         }
 
-        public async Task PublishShowtimePricing(ShowtimePricingPublishedEvent evnt)
+        public async Task PublishShowtimePricing(ShowtimePricingPublishedEvent @event)
         {
-            var message = JsonSerializer.Serialize(evnt);
+            var message = JsonSerializer.Serialize(@event);
+
+            await SendMessage(
+                exchange: "theater.events",
+                routingKey: "showtime.pricing",
+                message
+            );
+        }
+
+        public async Task PublishShowtime(ShowtimeCreatedEvent @event)
+        {
+            var message = JsonSerializer.Serialize(@event);
 
             await SendMessage(
                 exchange: "theater.events",
@@ -69,5 +80,6 @@ namespace TheaterService.Services.AsyncDataService
                 await _connection.CloseAsync();
             }
         }
+
     }
 }

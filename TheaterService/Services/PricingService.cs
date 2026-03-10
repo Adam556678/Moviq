@@ -13,7 +13,7 @@ namespace TheaterService.Services
             _pricingRepository = pricingRepository;
         }
 
-        public async Task<decimal> CalculatePriceAsync(Showtime showtime)
+        public async Task<Dictionary<Guid, decimal>> CalculatePriceAsync(Showtime showtime)
         {
             // get hall pricing
             var hallPricing = await _pricingRepository.GetHallPricingAsync(showtime.Hall.HallType);
@@ -27,7 +27,7 @@ namespace TheaterService.Services
 
             // get seat pricings
             var allSeatPricings = await _pricingRepository.GetAllSeatPricingsAsync();
-            decimal totalBasePrice = 0;
+            Dictionary<Guid, decimal> seatPrices = [];
 
             foreach (var showtimeSeat in showtime.SeatStates)
             {
@@ -35,10 +35,10 @@ namespace TheaterService.Services
                 if (pricing == null)
                     throw new Exception($"pricing for seat type: {showtimeSeat.Seat.SeatType} deos not exist");
                 
-                totalBasePrice += pricing.BasePrice;
+                seatPrices[showtimeSeat.Id] = pricing.BasePrice * hallPricing.Multiplier * timePricing.Multiplier;
             }
 
-            return totalBasePrice * hallPricing.Multiplier * timePricing.Multiplier;
+            return seatPrices;
         }
     }
 }

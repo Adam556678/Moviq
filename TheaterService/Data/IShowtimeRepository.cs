@@ -9,6 +9,8 @@ namespace TheaterService.Data
 
         Task<IEnumerable<Showtime>> GetAllShowtimesAsync();
 
+        Task<Showtime> GetByIdAsync(Guid id);
+
         Task UpdateShowtimeAsync(UpdateShowtimeDto updateShowtimeDto, Guid id);
 
         Task DeleteShowtimeAsync(Guid id);

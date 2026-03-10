@@ -4,6 +4,8 @@ namespace TheaterService.Services.AsyncDataService
 {
     public interface IEventBusPublisher
     {
-        Task PublishShowtimePricing(ShowtimePricingPublishedEvent evnt);
+        Task PublishShowtimePricing(ShowtimePricingPublishedEvent @event);
+
+        Task PublishShowtime(ShowtimeCreatedEvent @event);
     }
 }

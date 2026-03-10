@@ -2,6 +2,9 @@ using HotChocolate.Authorization;
 using TheaterService.Data;
 using TheaterService.DTOs;
 using TheaterService.Models;
+using TheaterService.Services;
+using TheaterService.Services.AsyncDataService;
+using TheaterService.Services.Events;
 
 namespace TheaterService.GraphQL
 {
@@ -11,7 +14,9 @@ namespace TheaterService.GraphQL
         [Authorize(Roles = new[] {"Admin"})]
         public async Task<Showtime> AddShowtime(
             AddShowtimeDto input,
-            [Service] IShowtimeRepository showtimeRepository
+            [Service] IShowtimeRepository showtimeRepository,
+            [Service] IEventBusPublisher eventBusPublisher,
+            [Service] IPricingService pricingService
         )
         {
             try
@@ -25,6 +30,28 @@ namespace TheaterService.GraphQL
     
                 await showtimeRepository.AddShowtimeAsync(showtime);
                 await showtimeRepository.SaveChangesAsync();
+
+                // get full showtime
+                var fullShowtime = await showtimeRepository.GetByIdAsync(showtime.Id);
+
+                // Publish ShowtimeCreated and SowtimePricingPublished event
+                var showtimeCreatedEvent = new ShowtimeCreatedEvent
+                {
+                    ShowtimeId = fullShowtime.Id,
+                    HallName = fullShowtime.Hall.Name,
+                    MovieTitle = fullShowtime.Movie.Title
+                };
+
+                var seatPrices = await pricingService.CalculatePriceAsync(fullShowtime);
+
+                var showtimePricingEvent = new ShowtimePricingPublishedEvent{
+                    ShowtimeId = fullShowtime.Id,
+                    SeatPrices = seatPrices
+                };
+
+                await eventBusPublisher.PublishShowtime(showtimeCreatedEvent);
+                await eventBusPublisher.PublishShowtimePricing(showtimePricingEvent);
+
                 return showtime;
             }
             catch (Exception e)

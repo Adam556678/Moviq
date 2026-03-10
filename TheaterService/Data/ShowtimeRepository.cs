@@ -56,6 +56,20 @@ namespace TheaterService.Data
             await _context.Showtimes.AddAsync(showtime);
         }
 
+        public async Task<Showtime> GetByIdAsync(Guid id)
+        {
+            var showtime = await _context.Showtimes
+                .Include(s => s.Movie)
+                .Include(s => s.Hall)
+                .Include(s => s.SeatStates)
+                .FirstOrDefaultAsync(s => s.Id == id);
+
+            if (showtime == null)
+                throw new InvalidOperationException("Showtime does not exist");
+
+            return showtime;
+        }
+
         public async Task DeleteShowtimeAsync(Guid id)
         {
             var showtime = await _context.Showtimes.FindAsync(id);
