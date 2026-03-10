@@ -1,6 +1,6 @@
 namespace ReservationService.Services.AsyncDataService
 {
-    public class EventPusPublisher
+    public class EventBusPublisher
     {
         
     }

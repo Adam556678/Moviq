@@ -90,6 +90,6 @@ app.UseAuthorization();
 
 app.MapGraphQL();
 
-await PrepDb.PrepPopulation(app);
+// await PrepDb.PrepPopulation(app);
 
 app.Run();

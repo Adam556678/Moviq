@@ -72,6 +72,7 @@ builder.Services
     .AddTypeExtension<HallMutation>()
     .AddTypeExtension<ShowtimeMutation>()
     .AddTypeExtension<PricingMutation>()
+    .AddType<TimeSpanType>()
     .AddProjections()
     .AddFiltering()
     .AddSorting();

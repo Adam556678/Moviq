@@ -43,16 +43,18 @@ namespace TheaterService.GraphQL
                 };
 
                 var seatPrices = await pricingService.CalculatePriceAsync(fullShowtime);
+                if (seatPrices == null)
+                    throw new GraphQLException("Showtime has no pricing");
 
                 var showtimePricingEvent = new ShowtimePricingPublishedEvent{
                     ShowtimeId = fullShowtime.Id,
                     SeatPrices = seatPrices
                 };
 
-                await eventBusPublisher.PublishShowtime(showtimeCreatedEvent);
+                await eventBusPublisher.PublishShowtimeCreated(showtimeCreatedEvent);
                 await eventBusPublisher.PublishShowtimePricing(showtimePricingEvent);
 
-                return showtime;
+                return fullShowtime;
             }
             catch (Exception e)
             {
@@ -63,12 +65,22 @@ namespace TheaterService.GraphQL
         [Authorize(Roles = new[] {"Admin"})]
         public async Task<bool> DeleteShowtime(
             Guid id,
-            [Service] IShowtimeRepository showtimeRepository
+            [Service] IShowtimeRepository showtimeRepository,
+            [Service] IEventBusPublisher eventBusPublisher
         )
         {
             try
             {
                 await showtimeRepository.DeleteShowtimeAsync(id);
+                await showtimeRepository.SaveChangesAsync();
+
+                // Publish showtime deleted event to RabbitMQ
+                var @event = new ShowtimeDeletedEvent
+                {
+                    ShowtimeId = id
+                };
+                await eventBusPublisher.PublishShowtimeDeleted(@event);
+
                 return true;
             }
             catch (Exception e)

@@ -34,13 +34,24 @@ namespace TheaterService.Services.AsyncDataService
             );
         }
 
-        public async Task PublishShowtime(ShowtimeCreatedEvent @event)
+        public async Task PublishShowtimeCreated(ShowtimeCreatedEvent @event)
         {
             var message = JsonSerializer.Serialize(@event);
 
             await SendMessage(
                 exchange: "theater.events",
                 routingKey: "showtime.created",
+                message
+            );
+        }
+
+        public async Task PublishShowtimeDeleted(ShowtimeDeletedEvent @event)
+        {
+            var message = JsonSerializer.Serialize(@event);
+
+            await SendMessage(
+                exchange: "theater.events",
+                routingKey: "showtime.deleted",
                 message
             );
         }

@@ -1,4 +1,4 @@
-namespace ReservationService.Services.Events
+namespace TheaterService.Services.Events
 {
     public class ShowtimeDeletedEvent
     {

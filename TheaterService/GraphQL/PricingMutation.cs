@@ -10,7 +10,7 @@ namespace TheaterService.GraphQL
 
         // --------------- Hall Pricing ---------------
         [Authorize(Roles = new[] {"Admin"})]
-        public async Task AddHallPricing(
+        public async Task<bool> AddHallPricing(
             AddHallPricingDto pricingDto,
             [Service] IPricingRepository pricingRepository
         )
@@ -25,6 +25,7 @@ namespace TheaterService.GraphQL
             try
             {
                 await pricingRepository.AddHallPricing(pricing);
+                return true;
             }
             catch (Exception e)
             {
@@ -33,7 +34,7 @@ namespace TheaterService.GraphQL
         }
 
         [Authorize(Roles = new[] {"Admin"})]
-        public async Task UpdateHallPricing(
+        public async Task<bool> UpdateHallPricing(
             Guid id,
             UpdateHallPricingDto pricingDto,
             [Service] IPricingRepository pricingRepository)
@@ -41,6 +42,7 @@ namespace TheaterService.GraphQL
             try
             {
                 await pricingRepository.UpdateHallPricing(id, pricingDto);
+                return true;
             }
             catch (Exception e)
             {
@@ -49,13 +51,14 @@ namespace TheaterService.GraphQL
         }
 
         [Authorize(Roles = new[] {"Admin"})]
-        public async Task RemoveHallPricing(
+        public async Task<bool> RemoveHallPricing(
             Guid id,
             [Service] IPricingRepository pricingRepository)
         {
             try
             {
                 await pricingRepository.RemoveHallPricing(id);
+                return true;
             }
             catch (Exception e)
             {
@@ -66,7 +69,7 @@ namespace TheaterService.GraphQL
         // ---------- SeatPricing ----------
 
         [Authorize(Roles = new[] {"Admin"})]
-        public async Task AddSeatPricing(
+        public async Task<bool> AddSeatPricing(
             AddSeatPricingDto seatPricingDto,
             [Service] IPricingRepository pricingRepository)
         {
@@ -81,6 +84,7 @@ namespace TheaterService.GraphQL
             try
             {
                 await pricingRepository.AddSeatPricing(pricing);
+                return true;
             }
             catch (Exception e)
             {
@@ -89,7 +93,7 @@ namespace TheaterService.GraphQL
         }
 
         [Authorize(Roles = new[] {"Admin"})]
-        public async Task UpdateSeatPricing(
+        public async Task<bool> UpdateSeatPricing(
             Guid id,
             UpdateSeatPricingDto seatPricingDto,
             [Service] IPricingRepository pricingRepository)
@@ -97,6 +101,7 @@ namespace TheaterService.GraphQL
             try
             {
                 await pricingRepository.UpdateSeatPricing(id, seatPricingDto);
+                return true;
             }
             catch (Exception e)
             {
@@ -105,13 +110,14 @@ namespace TheaterService.GraphQL
         }
 
         [Authorize(Roles = new[] {"Admin"})]
-        public async Task RemoveSeatPricing(
+        public async Task<bool> RemoveSeatPricing(
             Guid id,
             [Service] IPricingRepository pricingRepository)
         {
             try
             {
                 await pricingRepository.RemoveSeatPricing(id);
+                return true;
             }
             catch (Exception e)
             {
@@ -122,7 +128,7 @@ namespace TheaterService.GraphQL
         // ---------- TimePricing ----------
 
         [Authorize(Roles = new[] {"Admin"})]
-        public async Task AddTimePricing(
+        public async Task<bool> AddTimePricing(
             AddTimePricingDto timePricingDto,
             [Service] IPricingRepository pricingRepository)
         {
@@ -136,6 +142,7 @@ namespace TheaterService.GraphQL
             try
             {
                 await pricingRepository.AddTimePricing(pricing);
+                return true;
             }
             catch (Exception e)
             {
@@ -144,7 +151,7 @@ namespace TheaterService.GraphQL
         }
         
         [Authorize(Roles = new[] {"Admin"})]
-        public async Task UpdateTimePricing(
+        public async Task<bool> UpdateTimePricing(
             Guid id,
             UpdateTimePricingDto timePricingDto,
             [Service] IPricingRepository pricingRepository)
@@ -152,6 +159,7 @@ namespace TheaterService.GraphQL
             try
             {
                 await pricingRepository.UpdateTimePricing(id, timePricingDto);
+                return true;
             }
             catch (Exception e)
             {
@@ -160,13 +168,14 @@ namespace TheaterService.GraphQL
         }
 
         [Authorize(Roles = new[] {"Admin"})]
-        public async Task RemoveTimePricing(
+        public async Task<bool> RemoveTimePricing(
             Guid id,
             [Service] IPricingRepository pricingRepository)
         {
             try
             {
                 await pricingRepository.RemoveTimePricing(id);
+                return true;
             }
             catch (Exception e)
             {
