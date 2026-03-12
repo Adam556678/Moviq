@@ -7,5 +7,7 @@ namespace ReservationService.Services.Events
         public required string MovieTitle { get; set; }
 
         public required string HallName { get; set; }
+
+        public DateTime StartTime { get; set; }
     }
 }

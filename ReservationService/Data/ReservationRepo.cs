@@ -18,10 +18,5 @@ namespace ReservationService.Data
         {
             throw new NotImplementedException();
         }
-
-        private Task<decimal> CalculateTotalPrice()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

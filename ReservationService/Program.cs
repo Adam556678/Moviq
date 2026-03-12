@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ReservationService.Data;
+using ReservationService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,9 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<AppDbContext>(options => 
     options.UseNpgsql(builder.Configuration.GetConnectionString("ReservationConn")));
 
+
+builder.Services.AddScoped<IShowtimeService, ShowtimeService>();
+builder.Services.AddScoped<IShowtimePricingService, ShowtimePricingService>();
 
 var app = builder.Build();
 

@@ -39,7 +39,8 @@ namespace TheaterService.GraphQL
                 {
                     ShowtimeId = fullShowtime.Id,
                     HallName = fullShowtime.Hall.Name,
-                    MovieTitle = fullShowtime.Movie.Title
+                    MovieTitle = fullShowtime.Movie.Title,
+                    StartTime = fullShowtime.StartTime
                 };
 
                 var seatPrices = await pricingService.CalculatePriceAsync(fullShowtime);
@@ -52,7 +53,7 @@ namespace TheaterService.GraphQL
                 };
 
                 await eventBusPublisher.PublishShowtimeCreated(showtimeCreatedEvent);
-                await eventBusPublisher.PublishShowtimePricing(showtimePricingEvent);
+                await eventBusPublisher.PublishShowtimePricingCreated(showtimePricingEvent);
 
                 return fullShowtime;
             }

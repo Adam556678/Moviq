@@ -1,13 +1,13 @@
 namespace ReservationService.Models
 {
-    public class Showtime
+    public class SeatPricing
     {
         public Guid Id { get; set; }
 
         public Guid ShowtimeId { get; set; }
 
-        public required string MovieName { get; set; }
+        public Guid SeatId { get; set; }
 
-        public DateTime StartTime { get; set; }
+        public decimal Price { get; set; }
     }
 }
