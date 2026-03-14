@@ -1,11 +1,11 @@
-namespace ReservationService.Services.Events
+namespace TheaterService.Services.Events
 {
     public class SeatStatusUpdateRequested
     {
         public Guid ShowtimeId { get; set; }
 
         public Guid ReservationId { get; set; }
-
+        
         public ICollection<Guid> SeatIds { get; set; } = new List<Guid>();
 
         public StatusRequest StatusRequest { get; set; }

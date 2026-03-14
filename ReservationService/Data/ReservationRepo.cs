@@ -73,18 +73,20 @@ namespace ReservationService.Data
                     .CalculateTotalPrice(reservationDto.SeatsId, reservationDto.ShowtimeId)
             };
 
+            // Add to DB and save
+            await _context.Reservations.AddAsync(reservation);
+            await _context.SaveChangesAsync();
+
             // Publish seat lock event
             var seatStatusUpdatedRequest = new SeatStatusUpdateRequested
             {
                 SeatIds = reservationDto.SeatsId,
+                ReservationId = reservation.Id,
                 ShowtimeId = reservationDto.ShowtimeId,
                 StatusRequest = StatusRequest.Lock
             };
             await _eventPublisher.PublishSeatLockingRequest(seatStatusUpdatedRequest);
 
-            // Add to DB and save
-            await _context.Reservations.AddAsync(reservation);
-            await _context.SaveChangesAsync();
 
             return reservation;
         }

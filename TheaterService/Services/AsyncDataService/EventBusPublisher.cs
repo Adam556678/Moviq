@@ -57,6 +57,17 @@ namespace TheaterService.Services.AsyncDataService
             );
         }
 
+        public async Task PublishSeatStatusUpdateResponse(SeatStatusUpdateResponse @event)
+        {
+            var message = JsonSerializer.Serialize(@event);
+
+            await SendMessage(
+                exchange: "theater.events",
+                routingKey: "seatLock.updated",
+                message
+            );
+        }
+
          private async Task EnsureConnection(string exchange)
         {
             if (_channel != null && _channel.IsOpen)

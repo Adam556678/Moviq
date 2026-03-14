@@ -7,5 +7,6 @@ namespace TheaterService.Services.AsyncDataService
         Task PublishShowtimePricingCreated(ShowtimePricingPublishedEvent @event);
         Task PublishShowtimeCreated(ShowtimeCreatedEvent @event);
         Task PublishShowtimeDeleted(ShowtimeDeletedEvent @event);
+        Task PublishSeatStatusUpdateResponse(SeatStatusUpdateResponse @event);
     }
 }

@@ -34,16 +34,7 @@ namespace TheaterService.Services
                 });
             }
         }
-        public Task HandleSeatReleaseRequest()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task ReserveSeat()
-        {
-            throw new NotImplementedException();
-        }
-
+        
         public async Task<bool> TryLockSeatAsync(Guid showtimeId, List<Guid> seatIds)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
