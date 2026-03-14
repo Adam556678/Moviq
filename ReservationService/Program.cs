@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using ReservationService.Data;
 using ReservationService.GraphQL;
 using ReservationService.Services;
+using ReservationService.Services.AsyncDataService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,8 +64,13 @@ builder.Services
     .AddFiltering()
     .AddSorting();
 
+builder.Services.AddSingleton<EventBusPublisher>();
+builder.Services.AddHostedService<EventBusSubscriber>();
+
 builder.Services.AddScoped<IShowtimeService, ShowtimeService>();
+builder.Services.AddScoped<ISeatService, SeatService>();
 builder.Services.AddScoped<IShowtimePricingService, ShowtimePricingService>();
+builder.Services.AddScoped<IReservationRepo, ReservationRepo>();
 
 var app = builder.Build();
 

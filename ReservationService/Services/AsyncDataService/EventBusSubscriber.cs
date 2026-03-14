@@ -40,29 +40,35 @@ namespace ReservationService.Services.AsyncDataService
             );
 
             await _channel.QueueDeclareAsync(
-                queue: "reservation.theater",
+                queue: "theater.reservation",
                 durable: true,
                 exclusive: false,
                 autoDelete: false
             );
 
             await _channel.QueueBindAsync(
-                queue: "reservation.theater",
+                queue: "theater.reservation",
                 exchange: "theater.events",
                 routingKey: "showtime.created"
             );
 
             await _channel.QueueBindAsync(
-                queue: "reservation.theater",
+                queue: "theater.reservation",
                 exchange: "theater.events",
                 routingKey: "showtime.deleted"
             );
 
 
             await _channel.QueueBindAsync(
-                queue: "reservation.theater",
+                queue: "theater.reservation",
                 exchange: "theater.events",
                 routingKey: "showtime.pricing.created"
+            );
+
+            await _channel.QueueBindAsync(
+                queue: "theater.reservation",
+                exchange: "theater.events",
+                routingKey: "seatLock.updated"
             );
 
             Console.WriteLine("--> Listening for theater events...");
@@ -126,6 +132,16 @@ namespace ReservationService.Services.AsyncDataService
                         },
                         showtimePricingCreated.SeatPrices
                     );
+                }else if (routingKey == "seatLock.updated")
+                {
+                    var seatStatusUpdateResponse = JsonSerializer
+                        .Deserialize<SeatStatusUpdateResponse>(body);
+
+                    if (seatStatusUpdateResponse == null)
+                        throw new Exception("SeatStatusUpdateResponse deserialization failed");
+
+                    // TODO: Complete reservation
+                    Console.WriteLine($"SeatStatusUpdatedResponse received, reservationId: {seatStatusUpdateResponse.ReservationId}, success: {seatStatusUpdateResponse.LockSucceeded}");
                 }
 
                 // message processed, delete from queue
@@ -133,7 +149,7 @@ namespace ReservationService.Services.AsyncDataService
             };
 
             await _channel!.BasicConsumeAsync(
-                queue: "reservation.theater",
+                queue: "theater.reservation",
                 autoAck: false,
                 consumer: consumer
             );
