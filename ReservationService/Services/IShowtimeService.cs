@@ -6,6 +6,8 @@ namespace ReservationService.Services
     {
         Task CreateShowtimeAsync(Showtime showtime);
 
+        Task<Showtime?> GetByIdAsync(Guid id);
+
         Task DeleteShowtimeAsync(Guid showtimeId);
     }
 }

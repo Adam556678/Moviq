@@ -14,6 +14,7 @@ namespace ReservationService.Services
             _context = context;
         }
 
+
         public async Task CreateShowtimePricing(
             ShowtimePricing pricing,
             Dictionary<Guid, decimal> seatPrices
@@ -29,6 +30,21 @@ namespace ReservationService.Services
             await _context.SeatPricings.AddRangeAsync(newSeatPrices);
             await _context.ShowtimePricings.AddAsync(pricing);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<decimal> CalculateTotalPrice(
+            ICollection<Guid> seatIds, 
+            Guid showtimeId
+        )
+        {
+            var seatPricings = await _context.SeatPricings.Where(s => 
+                s.ShowtimeId == showtimeId && seatIds.Contains(s.SeatId))
+                .ToListAsync();
+            
+            if (!seatPricings.Any())
+                throw new Exception("Pricing for the seats does not exist");
+            
+            return seatPricings.Sum(s => s.Price);
         }
 
         public async Task<ShowtimePricing> GetByIdAsync(Guid showtimeId)

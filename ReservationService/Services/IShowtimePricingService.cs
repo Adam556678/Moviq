@@ -10,5 +10,7 @@ namespace ReservationService.Services
         );
 
         Task<ShowtimePricing> GetByIdAsync(Guid showtimeId);
+
+        Task<decimal> CalculateTotalPrice(ICollection<Guid> seatIds, Guid showtimeId);
     }
 }

@@ -32,5 +32,11 @@ namespace ReservationService.Services
             _context.Showtimes.Remove(showtime);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<Showtime?> GetByIdAsync(Guid id)
+        {
+            return await _context.Showtimes.FirstOrDefaultAsync(
+                st => st.ShowtimeId == id);
+        }
     }
 }
