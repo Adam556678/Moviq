@@ -1,6 +1,8 @@
 using ReservationService.DTOs;
 using ReservationService.Models;
 using ReservationService.Services;
+using ReservationService.Services.AsyncDataService;
+using ReservationService.Services.Events;
 
 namespace ReservationService.Data
 {
@@ -12,17 +14,21 @@ namespace ReservationService.Data
         private readonly ISeatService _seatService;
         private readonly IShowtimePricingService _pricingService;
 
+        private readonly EventBusPublisher _eventPublisher;
+
         public ReservationRepo(
             AppDbContext context,
             IShowtimeService showtimeService,
             ISeatService seatService,
-            IShowtimePricingService pricingService
+            IShowtimePricingService pricingService,
+            EventBusPublisher eventPublisher
         )
         {
             _context = context;
             _showtimeService = showtimeService;
             _seatService = seatService;
             _pricingService = pricingService;
+            _eventPublisher = eventPublisher;
         }
 
         public async Task<Reservation> GetReservationDetails(Guid reservationId)
@@ -36,7 +42,7 @@ namespace ReservationService.Data
             return reservation;
         }
 
-        public async Task MakeReservation(MakeReservationDto reservationDto, Guid userId)
+        public async Task<Reservation> MakeReservation(MakeReservationDto reservationDto, Guid userId)
         {
 
             // Check if showtime exists
@@ -61,15 +67,26 @@ namespace ReservationService.Data
                     .Select(seatId => new ReservationSeat
                     {
                         ShowtimeSeatId = seatId
-                    }).ToList()
+                    }).ToList(),
+                // Get total price
+                TotalAmount = await _pricingService
+                    .CalculateTotalPrice(reservationDto.SeatsId, reservationDto.ShowtimeId)
             };
 
-            // Get total price
-            reservation.TotalAmount = await _pricingService
-                .CalculateTotalPrice(reservationDto.SeatsId, reservationDto.ShowtimeId);
-            
+            // Publish seat lock event
+            var seatStatusUpdatedRequest = new SeatStatusUpdateRequested
+            {
+                SeatIds = reservationDto.SeatsId,
+                ShowtimeId = reservationDto.ShowtimeId,
+                StatusRequest = StatusRequest.Lock
+            };
+            await _eventPublisher.PublishSeatLockingRequest(seatStatusUpdatedRequest);
+
+            // Add to DB and save
             await _context.Reservations.AddAsync(reservation);
             await _context.SaveChangesAsync();
+
+            return reservation;
         }
     }
 }

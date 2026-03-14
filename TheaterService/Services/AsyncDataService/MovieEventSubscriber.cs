@@ -8,14 +8,14 @@ using TheaterService.Services.Events;
 
 namespace TheaterService.Services.AsyncDataService
 {
-    public class EventBusSubscriber : BackgroundService
+    public class MovieEventSubscriber : BackgroundService
     {
         private IConnection? _connection;
         private IChannel? _channel;
         private readonly IConfiguration _configuration;
         private readonly IServiceScopeFactory _scopeFactory;
 
-        public EventBusSubscriber(
+        public MovieEventSubscriber(
             IConfiguration configuration,
             IServiceScopeFactory scopeFactory    
         )

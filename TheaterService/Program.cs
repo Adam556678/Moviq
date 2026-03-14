@@ -57,7 +57,8 @@ builder.Services
 builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<IMoviesService, MoviesService>();
-builder.Services.AddHostedService<EventBusSubscriber>();
+builder.Services.AddHostedService<MovieEventSubscriber>();
+builder.Services.AddHostedService<SeatLockSubscriber>();
 builder.Services.AddSingleton<IEventBusPublisher, EventBusPublisher>();
 
 builder.Services

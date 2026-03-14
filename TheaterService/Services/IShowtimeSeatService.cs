@@ -6,7 +6,7 @@ namespace TheaterService.Services
     {
         void InitializeSeatsForShowtime(Showtime showtime);
 
-        Task HandleSeatLockRequest();
+        Task<bool> TryLockSeatAsync(Guid showtimeId, List<Guid> seatIds);
 
         Task HandleSeatReleaseRequest();
 

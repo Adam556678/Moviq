@@ -5,7 +5,7 @@ namespace ReservationService.Data
 {
     public interface IReservationRepo
     {
-        Task MakeReservation(MakeReservationDto reservationDto, Guid userId);
+        Task<Reservation> MakeReservation(MakeReservationDto reservationDto, Guid userId);
 
         Task<Reservation> GetReservationDetails(Guid reservationId);
 
