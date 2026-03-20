@@ -12,7 +12,7 @@ namespace ReservationService.GraphQL
         {
             try
             {
-                var reservation = await reservationRepo.GetReservationDetails(id);
+                var reservation = await reservationRepo.GetByIdAsync(id);
                 return reservation;
             }
             catch (System.Exception e)

@@ -11,7 +11,6 @@ namespace PaymentService.Models
 
         public decimal Price { get; set; }
         public string Currency { get; set; } = "usd";
-        public int Quantity { get; set; }
 
         public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
 

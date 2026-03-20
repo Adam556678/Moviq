@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using ReservationService.Data;
 using ReservationService.Models;
 using ReservationService.Services.Events;
 
@@ -86,6 +87,7 @@ namespace ReservationService.Services.AsyncDataService
 
                 var showtimeService = scope.ServiceProvider.GetRequiredService<IShowtimeService>();
                 var showtimePricingService = scope.ServiceProvider.GetRequiredService<IShowtimePricingService>();
+                var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
                 var routingKey = args.RoutingKey;
                 var body = Encoding.UTF8.GetString(args.Body.ToArray());
@@ -104,7 +106,8 @@ namespace ReservationService.Services.AsyncDataService
                     {
                         MovieName = showtimeCreatedEvent.MovieTitle,
                         ShowtimeId = showtimeCreatedEvent.ShowtimeId,
-                        StartTime = showtimeCreatedEvent.StartTime
+                        StartTime = showtimeCreatedEvent.StartTime,
+                        HallName = showtimeCreatedEvent.HallName
                     });
 
                 }else if (routingKey == "showtime.deleted")
@@ -140,8 +143,20 @@ namespace ReservationService.Services.AsyncDataService
                     if (seatStatusUpdateResponse == null)
                         throw new Exception("SeatStatusUpdateResponse deserialization failed");
 
-                    // TODO: Complete reservation
+                    var reservation = await context.Reservations.FindAsync(seatStatusUpdateResponse.ReservationId);
+
+                    if (reservation != null)
+                    {
+                        
+                    if (!seatStatusUpdateResponse.LockSucceeded)
+                    {
+                        reservation.Status = ReservationStatus.Cancelled;
+                        await context.SaveChangesAsync();
+                        Console.WriteLine("Seat is already taken. Reservation cancelled");
+                    }
+
                     Console.WriteLine($"SeatStatusUpdatedResponse received, reservationId: {seatStatusUpdateResponse.ReservationId}, success: {seatStatusUpdateResponse.LockSucceeded}");
+                    }
                 }
 
                 // message processed, delete from queue

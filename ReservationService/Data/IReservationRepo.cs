@@ -7,7 +7,7 @@ namespace ReservationService.Data
     {
         Task<Reservation> MakeReservation(MakeReservationDto reservationDto, Guid userId);
 
-        Task<Reservation> GetReservationDetails(Guid reservationId);
+        Task<Reservation> GetByIdAsync(Guid reservationId);
 
     }
 }

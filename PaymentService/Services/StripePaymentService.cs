@@ -36,9 +36,8 @@ namespace PaymentService.Services
             var payment = new Payment
             {
                 ReservationId = createdEvent.ReservationId,
-                Price = createdEvent.Price,
+                Price = createdEvent.TotalPrice,
                 Currency = createdEvent.Currency,
-                Quantity = createdEvent.Quantity,
                 StripeSessionId = session.Id,
                 StripePaymentIntentId = session.PaymentIntentId
             };
@@ -61,19 +60,22 @@ namespace PaymentService.Services
                     {
                         PriceData = new SessionLineItemPriceDataOptions
                         {
-                            UnitAmount = (long)(createdEvent.Price*100),
+                            UnitAmount = (long)(createdEvent.TotalPrice*100),
                             Currency = createdEvent.Currency,
                             ProductData = new SessionLineItemPriceDataProductDataOptions { 
                                 Name = createdEvent.MovieName, 
-                                Description =  $"Showtime starts at: {showTime}"
+                                Description =  $"Showtime starts at: {showTime}, Hall: {createdEvent.HallName}"
                             }
                         },
-                        Quantity = createdEvent.Quantity
+                        Quantity = 1
                     }
                 },
                 Mode = "payment",
                 // Pass the ReservationId in Metadata so Webhooks can find it later
-                Metadata = new Dictionary<string, string> { { "reservationId", createdEvent.ReservationId.ToString() } },
+                Metadata = new Dictionary<string, string> { 
+                    { "reservationId", createdEvent.ReservationId.ToString() },
+                    { "seatIds", string.Join(",", createdEvent.SeatIds) } 
+                },
                 SuccessUrl = _configuration["Stripe:SuccessURL"] + $"?id={createdEvent.ReservationId}",
                 CancelUrl = _configuration["Stripe:CancelURL"]
             };

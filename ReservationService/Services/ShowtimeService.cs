@@ -38,5 +38,6 @@ namespace ReservationService.Services
             return await _context.Showtimes.FirstOrDefaultAsync(
                 st => st.ShowtimeId == id);
         }
+
     }
 }

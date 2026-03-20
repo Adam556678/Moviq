@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using ReservationService.DTOs;
 using ReservationService.Models;
 using ReservationService.Services;
@@ -31,10 +32,11 @@ namespace ReservationService.Data
             _eventPublisher = eventPublisher;
         }
 
-        public async Task<Reservation> GetReservationDetails(Guid reservationId)
+        public async Task<Reservation> GetByIdAsync(Guid reservationId)
         {
             var reservation =  await _context.Reservations
-                .FindAsync(reservationId);
+                .Include(r => r.ReservedSeats)
+                .FirstOrDefaultAsync(r => r.Id == reservationId);
             
             if (reservation == null)
                 throw new InvalidOperationException("Reservation with this id does not exist");
@@ -46,7 +48,7 @@ namespace ReservationService.Data
         {
 
             // Check if showtime exists
-            var showtimeExists = _showtimeService
+            var showtimeExists = await _showtimeService
                 .GetByIdAsync(reservationDto.ShowtimeId);
 
             if (showtimeExists == null)
@@ -86,7 +88,6 @@ namespace ReservationService.Data
                 StatusRequest = StatusRequest.Lock
             };
             await _eventPublisher.PublishSeatLockingRequest(seatStatusUpdatedRequest);
-
 
             return reservation;
         }

@@ -1,4 +1,4 @@
-namespace PaymentService.Services.Events
+namespace ReservationService.Services.Events
 {
     public class ReservationCreatedEvent
     {
