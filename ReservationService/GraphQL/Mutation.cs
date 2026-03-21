@@ -1,11 +1,14 @@
 using System.Security.Claims;
+using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.Authorization;
+using PaymentService;
 using ReservationService.Data;
 using ReservationService.DTOs;
 using ReservationService.Models;
 using ReservationService.Services;
 using ReservationService.Services.AsyncDataService;
 using ReservationService.Services.Events;
+using ReservationService.Services.SyncDataService.gRPC;
 
 namespace ReservationService.GraphQL
 {
@@ -38,11 +41,11 @@ namespace ReservationService.GraphQL
         }
 
         [Authorize]
-        public async Task<bool> ProcessPayment(
+        public async Task<string> ProcessPayment(
             Guid reservationId,
             [Service] IReservationRepo reservationRepo,
             [Service] IShowtimeService showtimeService,
-            [Service] EventBusPublisher eventPublisher
+            [Service] IPaymentDataClient paymentDataClient
         )
         {
             // Get reservation and showtime details
@@ -58,28 +61,26 @@ namespace ReservationService.GraphQL
             if (reservation.Status == ReservationStatus.Cancelled)
                 throw new GraphQLException("Seats are no longer available.");
 
-            try
+            var request = new PaymentRequest
             {
-                // Create ReservationCreated Event and publish
-                var reservationCreated = new ReservationCreatedEvent
-                {
-                    ReservationId = reservation.Id,
-                    ShowtimeStart = showtime.StartTime,
-                    HallName = showtime.HallName,
-                    MovieName = showtime.MovieName,
-                    SeatIds = reservation.ReservedSeats
-                        .Select(rs => rs.ShowtimeSeatId)
-                        .ToList(),
-                    TotalPrice = reservation.TotalAmount
-                };
+                ReservationId = reservation.Id.ToString(),
+                HallName = showtime.HallName,
+                MovieName = showtime.MovieName,
+                Amount = (double)reservation.TotalAmount,
+                ShowtimeStart = Timestamp.FromDateTime(showtime.StartTime.ToUniversalTime())
+            };
 
-                await eventPublisher.PublishReservationCreated(reservationCreated);
-                return true;
-            }
-            catch (System.Exception e)
+            foreach (var seat in reservation.ReservedSeats)
             {
-                throw new GraphQLException(e.Message);
+                request.SeatIds.Add(seat.ShowtimeSeatId.ToString());
             }
+
+            var response = await paymentDataClient.CreateCheckoutSession(request);
+
+            if (response.Success)
+                return response.StripeSessionUrl;
+            
+            throw new GraphQLException("Payment intialization failed.");
         }
     }
 }

@@ -2,10 +2,12 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using PaymentService;
 using ReservationService.Data;
 using ReservationService.GraphQL;
 using ReservationService.Services;
 using ReservationService.Services.AsyncDataService;
+using ReservationService.Services.SyncDataService.gRPC;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +51,13 @@ builder.Services
             }
         };
     });
+
+builder.Services.AddGrpc(); 
+builder.Services.AddGrpcClient<PaymentGrpc.PaymentGrpcClient>(o =>
+{
+    o.Address = new Uri(builder.Configuration["GrpcPaymentService"]!);
+});
+builder.Services.AddScoped<IPaymentDataClient, PaymentDataClient>();
 
 builder.Services
     .AddGraphQLServer()
