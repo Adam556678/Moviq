@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "PaymentService";
+
+service PaymentGrpc{
+    rpc CreateCheckoutSession(PaymentRequest) returns (PaymentResponse);
+}
+
+message PaymentRequest{
+    string reservation_id = 1;
+    double amount = 2;
+    string movie_name = 3;
+    string hall_name = 4;
+    google.protobuf.Timestamp showtime_start = 5;
+    repeated string seat_ids = 6;
+}
+
+message PaymentResponse{
+    string stripe_session_url = 1;
+    bool success = 2;
+}

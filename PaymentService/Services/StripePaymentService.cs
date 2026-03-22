@@ -39,7 +39,8 @@ namespace PaymentService.Services
                 Price = createdEvent.TotalPrice,
                 Currency = createdEvent.Currency,
                 StripeSessionId = session.Id,
-                StripePaymentIntentId = session.PaymentIntentId
+                StripePaymentIntentId = session.PaymentIntentId,
+                Status = PaymentStatus.Pending
             };
 
             await _context.Payments.AddAsync(payment);

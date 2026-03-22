@@ -48,55 +48,60 @@ namespace PaymentService.Services.AsyncDataService
                 autoDelete: false
             );
 
-            await _channel.QueueBindAsync(
-                queue: "reservation.payments",
-                exchange: "payments.events",
-                routingKey: "reservation.created"
-            );
+            // await _channel.QueueBindAsync(
+            //     queue: "reservation.payments",
+            //     exchange: "payments.events",
+            //     routingKey: "reservation.created"
+            // );
 
             Console.WriteLine("--> Listening for payment events");
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            await InitializeRabbitMQ();
-
-            var consumer = new AsyncEventingBasicConsumer(_channel!);
-
-            // Listening for upcoming messages/events
-            consumer.ReceivedAsync += async (sender, args) =>
-            {
-                using var scope = _serviceScopeFactory.CreateScope();
-                var paymentService = scope.ServiceProvider.GetRequiredService<IPaymentsService>();
-
-                var routingKey = args.RoutingKey;
-                var body = Encoding.UTF8.GetString(args.Body.ToArray());
-
-                Console.WriteLine($"Event received: {routingKey}");
-
-                if (routingKey == "reservation.created")
-                {
-                    var reservationCreatedEvent = JsonSerializer
-                        .Deserialize<ReservationCreatedEvent>(body);
-
-                    if (reservationCreatedEvent == null)
-                        throw new InvalidOperationException("Event deserialization failed");
-
-                    // Create payment session and save to DB
-                    var session = await paymentService.CreateCheckoutSessionAsync(reservationCreatedEvent);
-                    await paymentService.SavePaymentAsync(reservationCreatedEvent, session);
-                }
-
-                // message processed, delete from queue
-                await _channel!.BasicAckAsync(args.DeliveryTag, multiple: false);
-            };
-
-            await _channel!.BasicConsumeAsync(
-                queue: "reservation.payments",
-                autoAck: false,
-                consumer: consumer
-            );
-
+            throw new NotImplementedException();
         }
+
+        // protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        // {
+        //     await InitializeRabbitMQ();
+
+        //     var consumer = new AsyncEventingBasicConsumer(_channel!);
+
+        //     // Listening for upcoming messages/events
+        //     consumer.ReceivedAsync += async (sender, args) =>
+        //     {
+        //         using var scope = _serviceScopeFactory.CreateScope();
+        //         var paymentService = scope.ServiceProvider.GetRequiredService<IPaymentsService>();
+
+        //         var routingKey = args.RoutingKey;
+        //         var body = Encoding.UTF8.GetString(args.Body.ToArray());
+
+        //         Console.WriteLine($"Event received: {routingKey}");
+
+        //         if (routingKey == "reservation.created")
+        //         {
+        //             var reservationCreatedEvent = JsonSerializer
+        //                 .Deserialize<ReservationCreatedEvent>(body);
+
+        //             if (reservationCreatedEvent == null)
+        //                 throw new InvalidOperationException("Event deserialization failed");
+
+        //             // Create payment session and save to DB
+        //             var session = await paymentService.CreateCheckoutSessionAsync(reservationCreatedEvent);
+        //             await paymentService.SavePaymentAsync(reservationCreatedEvent, session);
+        //         }
+
+        //         // message processed, delete from queue
+        //         await _channel!.BasicAckAsync(args.DeliveryTag, multiple: false);
+        //     };
+
+        //     await _channel!.BasicConsumeAsync(
+        //         queue: "reservation.payments",
+        //         autoAck: false,
+        //         consumer: consumer
+        //     );
+
+        // }
     }
 }

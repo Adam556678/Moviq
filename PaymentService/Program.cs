@@ -12,6 +12,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 
+
+
 builder.Services.AddDbContext<AppDbContext>(options => 
     options.UseNpgsql(builder.Configuration.GetConnectionString("PaymentConn")));
     
@@ -30,6 +32,11 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+// Map the gRPC Service endpoint
+app.MapGrpcService<PaymentService.Services.SyncDataService.GrpcPaymentService>();
+
+app.MapGet("/grpc", () => "Communication with gRPC endpoints must be made through a gRPC client.");
 
 app.UseHttpsRedirection();
 app.MapControllers();
