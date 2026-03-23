@@ -58,8 +58,6 @@ namespace ReservationService.GraphQL
                 throw new InvalidOperationException("Showtime for this reservation does not exist.");
 
             // SAFETY CHECK: Don't let them pay if the seat lock failed or hasn't arrived!
-            if (reservation.Status == ReservationStatus.Pending)
-                throw new GraphQLException("Seats are not locked, please try again.");
             if (reservation.Status == ReservationStatus.Cancelled)
                 throw new GraphQLException("Seats are no longer available.");
 

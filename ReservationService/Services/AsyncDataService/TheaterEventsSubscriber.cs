@@ -9,7 +9,7 @@ using ReservationService.Services.Events;
 
 namespace ReservationService.Services.AsyncDataService
 {
-    public class EventBusSubscriber : BackgroundService
+    public class TheaterEventsSubscriber : BackgroundService
     {
 
         private IConnection? _connection;
@@ -17,7 +17,7 @@ namespace ReservationService.Services.AsyncDataService
         private readonly IConfiguration _configuration;
         private readonly IServiceScopeFactory _scopeFactory;
 
-        public EventBusSubscriber(IConfiguration configuration, IServiceScopeFactory factory)
+        public TheaterEventsSubscriber(IConfiguration configuration, IServiceScopeFactory factory)
         {
             _configuration = configuration;
             _scopeFactory = factory;

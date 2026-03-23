@@ -31,6 +31,7 @@ namespace PaymentService.Controllers
         [HttpPost]
         public async Task<IActionResult> Handle()
         {
+            Console.WriteLine("--> Handling Stripe payment..");
             var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
 
             var stripeEvent = EventUtility.ConstructEvent(
@@ -41,6 +42,8 @@ namespace PaymentService.Controllers
 
             var session = stripeEvent.Data.Object as Session;
             var reservationId = Guid.Parse(session!.Metadata["reservationId"]);
+
+            Console.WriteLine("--> Stripe payment data received.");
 
             switch (stripeEvent.Type)
             {

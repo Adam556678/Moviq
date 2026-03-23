@@ -9,6 +9,9 @@ using ReservationService.Services;
 using ReservationService.Services.AsyncDataService;
 using ReservationService.Services.SyncDataService.gRPC;
 
+// Allow gRPC to use HTTP/2 without TLS
+AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -74,7 +77,8 @@ builder.Services
     .AddSorting();
 
 builder.Services.AddSingleton<EventBusPublisher>();
-builder.Services.AddHostedService<EventBusSubscriber>();
+builder.Services.AddHostedService<TheaterEventsSubscriber>();
+builder.Services.AddHostedService<PaymentEventsSubscriber>();
 
 builder.Services.AddScoped<IShowtimeService, ShowtimeService>();
 builder.Services.AddScoped<ISeatService, SeatService>();
@@ -89,7 +93,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
