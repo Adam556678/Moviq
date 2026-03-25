@@ -98,6 +98,25 @@ namespace TheaterService.Services.AsyncDataService
                         SeatIds = seatStatusUpdateRequest.SeatIds
                     };
                     await _eventBusPublisher.PublishSeatStatusUpdateResponse(seatStatusUpdateResponse);
+                }else if (routingKey == "seat.taken")
+                {
+                    var seatStatusUpdateRequest = JsonSerializer
+                        .Deserialize<SeatStatusUpdateRequested>(body);
+                    
+                    if (seatStatusUpdateRequest is null)
+                        throw new InvalidOperationException("SeatStatusUpdateRequest deserialization failed");
+
+                    // Take Seat
+                    List<Guid> seatIds = [..seatStatusUpdateRequest.SeatIds];
+                    bool seatTakenSuccess = await showtimeSeatService.TakeSeatAsync(seatStatusUpdateRequest.ShowtimeId, seatIds);
+
+                    if (seatTakenSuccess){
+                        Console.WriteLine($"Seats with ids: {seatIds} has been reserved successfully!");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Couldn't reserve seats");
+                    }
                 }
 
                 // message processed, delete from queue

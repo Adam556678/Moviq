@@ -34,7 +34,29 @@ namespace TheaterService.Services
                 });
             }
         }
-        
+
+        public async Task<bool> TakeSeatAsync(Guid showtimeId, List<Guid> seatIds)
+        {
+            try
+            {
+                var seatsToTake = await _context.ShowtimeSeats
+                    .Where(s => seatIds.Contains(s.Id) && s.ShowtimeId == showtimeId)
+                    .ToListAsync();
+                
+                foreach (var seat in seatsToTake)
+                {
+                    seat.Status = SeatState.Taken;
+                }
+    
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (System.Exception)
+            {
+                return false;
+            }
+        }
+
         public async Task<bool> TryLockSeatAsync(Guid showtimeId, List<Guid> seatIds)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();

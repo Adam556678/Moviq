@@ -8,5 +8,7 @@ namespace TheaterService.Services
 
         Task<bool> TryLockSeatAsync(Guid showtimeId, List<Guid> seatIds);
 
+        Task<bool> TakeSeatAsync(Guid showtimeId, List<Guid> seatIds);
+
     }
 }
