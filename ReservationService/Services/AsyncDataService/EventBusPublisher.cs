@@ -33,6 +33,17 @@ namespace ReservationService.Services.AsyncDataService
             );
         }
 
+        public async Task PublishSeatTakenRequest(SeatStatusUpdateRequested @event)
+        {
+            var message = JsonSerializer.Serialize(@event);
+
+            await SendMessage(
+                exchange: "reservation.events",
+                routingKey: "seat.taken",
+                message
+            );
+        }
+
         private async Task EnsureConnection(string exchange)
         {
             if (_channel != null && _channel.IsOpen)

@@ -1,7 +1,10 @@
 
 using System.Text;
+using System.Text.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using ReservationService.Data;
+using ReservationService.Services.Events;
 
 namespace ReservationService.Services.AsyncDataService
 {
@@ -72,6 +75,11 @@ namespace ReservationService.Services.AsyncDataService
 
             consumer.ReceivedAsync += async (sender, args) =>
             {
+                var scope = _scopeFactory.CreateScope();
+
+                var reservationRepo = scope.ServiceProvider.GetRequiredService<IReservationRepo>();
+                var eventPublisher = scope.ServiceProvider.GetRequiredService<EventBusPublisher>();
+
                 var routingKey = args.RoutingKey;
                 var body = Encoding.UTF8.GetString(args.Body.ToArray());
 
@@ -79,7 +87,24 @@ namespace ReservationService.Services.AsyncDataService
 
                 if (routingKey == "payment.succeeded")
                 {
-                    // Publish ReserveSeat to Theater Service
+                    var paymentStatusUpdatedEvent = JsonSerializer
+                        .Deserialize<PaymentStatusUpdatedEvent>(body);
+                    if (paymentStatusUpdatedEvent == null)
+                        throw new Exception("Failed to serialize PaymentStatusUpdated event.");
+
+                    // Create a SeatTakenRequest
+                    var reservation = await reservationRepo.GetByIdAsync(paymentStatusUpdatedEvent.ReservationId);
+                    var takeSeatRequest = new SeatStatusUpdateRequested
+                    {
+                        ReservationId = paymentStatusUpdatedEvent.ReservationId,
+                        ShowtimeId = reservation.ShowtimeId,
+                        SeatIds = reservation.ReservedSeats.Select(rs => rs.ShowtimeSeatId).ToList(),
+                        StatusRequest = StatusRequest.Taken
+                    };
+
+                    // Publish SeatTaken to Theater Service
+                    await eventPublisher.PublishSeatTakenRequest(takeSeatRequest);
+                    
                 }
 
                 await _channel!.BasicAckAsync(args.DeliveryTag, multiple: false);

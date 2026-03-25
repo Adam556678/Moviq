@@ -14,6 +14,7 @@ namespace ReservationService.Services.Events
     public enum StatusRequest
     {
         Lock,
+        Taken,
         Unlock
     }
 }
