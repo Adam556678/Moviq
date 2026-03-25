@@ -31,7 +31,6 @@ namespace PaymentService.Controllers
         [HttpPost]
         public async Task<IActionResult> Handle()
         {
-            Console.WriteLine("--> Handling Stripe payment..");
             var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
 
             var stripeEvent = EventUtility.ConstructEvent(
@@ -40,8 +39,6 @@ namespace PaymentService.Controllers
                 _configuration["Stripe:WebhookSecret"]
             );
 
-            var session = stripeEvent.Data.Object as Session;
-            var reservationId = Guid.Parse(session!.Metadata["reservationId"]);
 
             Console.WriteLine("--> Stripe payment data received.");
 
@@ -50,46 +47,64 @@ namespace PaymentService.Controllers
                 case "checkout.session.completed":
                     {
 
-                    // Update payment status
-                    await _paymentService.UpdatePaymentStatusAsync(
-                        reservationId, PaymentStatus.Succeeded);
-                    
-                    // broadcast the event
-                    var evnt = new PaymentStatusUpdatedEvent
+                    var session = stripeEvent.Data.Object as Session;
+                    if (session != null && session.Metadata.TryGetValue("reservationId", out var resId))
                     {
-                        ReservationId = reservationId,
-                        Status = PaymentStatus.Succeeded
-                    };
+                        var reservationId = Guid.Parse(resId);
 
-                    await _eventPublisher.PublishEvent(evnt, routingKey: "payment.succeeded");
+                        // Update payment status
+                        await _paymentService.UpdatePaymentStatusAsync(
+                            reservationId, PaymentStatus.Succeeded);
+                        
+                        // broadcast the event
+                        var evnt = new PaymentStatusUpdatedEvent
+                        {
+                            ReservationId = reservationId,
+                            Status = PaymentStatus.Succeeded
+                        };
+
+                        await _eventPublisher.PublishEvent(evnt, routingKey: "payment.succeeded");
+                    }
                     break;
                 }
                 case "checkout.session.expired":
                 {
-                    await _paymentService.UpdatePaymentStatusAsync(
-                        reservationId, PaymentStatus.Expired);
-                    
-                    var evnt = new PaymentStatusUpdatedEvent
+                    var session = stripeEvent.Data.Object as Session;
+                    if (session != null && session.Metadata.TryGetValue("reservationId", out var resId))
                     {
-                        ReservationId = reservationId,
-                        Status = PaymentStatus.Expired
-                    };
-                    await _eventPublisher.PublishEvent(evnt, routingKey: "payment.expired");
+                        var reservationId = Guid.Parse(resId);
+
+                        await _paymentService.UpdatePaymentStatusAsync(
+                            reservationId, PaymentStatus.Expired);
+                        
+                        var evnt = new PaymentStatusUpdatedEvent
+                        {
+                            ReservationId = reservationId,
+                            Status = PaymentStatus.Expired
+                        };
+                        await _eventPublisher.PublishEvent(evnt, routingKey: "payment.expired");    
+                    }
 
                     break;
                 }
                 case "payment_intent.payment_failed":
                     {
-                        await _paymentService.UpdatePaymentStatusAsync(
-                            reservationId, PaymentStatus.Failed
-                        );
-
-                        var evnt = new PaymentStatusUpdatedEvent
+                        var session = stripeEvent.Data.Object as Session;
+                        if (session != null && session.Metadata.TryGetValue("reservationId", out var resId))
                         {
-                            ReservationId = reservationId,
-                            Status = PaymentStatus.Failed
-                        };
-                        await _eventPublisher.PublishEvent(evnt, routingKey: "payment.failed");
+                            var reservationId = Guid.Parse(resId);
+
+                            await _paymentService.UpdatePaymentStatusAsync(
+                                reservationId, PaymentStatus.Failed
+                            );
+
+                            var evnt = new PaymentStatusUpdatedEvent
+                            {
+                                ReservationId = reservationId,
+                                Status = PaymentStatus.Failed
+                            };
+                            await _eventPublisher.PublishEvent(evnt, routingKey: "payment.failed");   
+                        }
 
                         break;
                     }

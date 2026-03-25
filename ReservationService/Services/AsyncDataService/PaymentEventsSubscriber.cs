@@ -77,6 +77,11 @@ namespace ReservationService.Services.AsyncDataService
 
                 Console.WriteLine($"Event received: {routingKey}");
 
+                if (routingKey == "payment.succeeded")
+                {
+                    // Publish ReserveSeat to Theater Service
+                }
+
                 await _channel!.BasicAckAsync(args.DeliveryTag, multiple: false);
             };
 
