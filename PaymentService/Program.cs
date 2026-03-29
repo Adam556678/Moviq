@@ -11,10 +11,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.ConfigureKestrel(options =>
 {
     // Port 5173: Dedicated to REST/Webhooks (HTTP/1.1)
-    options.ListenLocalhost(5173, o => o.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1);
+    options.Listen(System.Net.IPAddress.Any ,5173, o => o.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1);
     
     // Port 5174: Dedicated to gRPC (HTTP/2)
-    options.ListenLocalhost(5174, o => o.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2);
+    options.Listen(System.Net.IPAddress.Any, 5174, o => o.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2);
 });
 
 // Add services to the container.

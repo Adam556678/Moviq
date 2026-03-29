@@ -1,0 +1,99 @@
+services:
+  postgres_db:
+    image: postgres:latest
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    ports:
+      - "5432:5432"
+  
+  redis_cahce:
+    image: redis:latest
+
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  # --- Application Services ---
+
+  gateway-service:
+    build: ./GatewayService
+    ports:
+      - "4000:8080"
+    environment:
+      - ServiceUrls__Users=http://user-service:8080/graphql
+      - ServiceUrls__Movies=http://movie-service:8080/graphql
+      - ServiceUrls__Theater=http://theater-service:8080/graphql
+      - ServiceUrls__Reservation=http://reservation-service:8080/graphql
+    depends_on:
+      - user-service
+      - movie-service
+      - theater-service
+      - reservation-service
+
+  user-service:
+    build: ./UsersService
+    environment:
+      - ConnectionStrings__UsersConn=Host=postgres_db;Database=usersdb;Username=postgres;Password=${DB_PASSWORD}
+      - AppSettings__Token=${JWT_TOKEN_USER}
+    ports:
+      - "5289:8080"
+    depends_on:
+      - postgres_db
+
+  movie-service:
+    build: ./MoviesService
+    environment:
+      - ConnectionStrings__MoviesConn=Host=postgres_db;Database=moviesdb;Username=postgres;Password=${DB_PASSWORD}
+      - ConnectionStrings__Redis=redis_cache:6379
+      - RabbitMQHost=rabbitmq
+    ports:
+      - "5099:8080"
+    depends_on:
+      - postgres_db
+      - redis_cache
+      - rabbitmq
+
+  theater-service:
+    build: ./TheaterService
+    environment:
+      - ConnectionStrings__TheaterConn=Host=postgres_db;Database=theaterdb;Username=postgres;Password=${DB_PASSWORD}
+      - ConnectionStrings__Redis=redis_cache:6379
+      - RabbitMQHost=rabbitmq
+    ports:
+      - "5001:8080" 
+    depends_on:
+      - postgres_db
+      - redis_cache
+
+  payment-service:
+    build: ./PaymentService
+    environment:
+      - ConnectionStrings__PaymentConn=Host=postgres_db;Database=paymentdb;Username=postgres;Password=${DB_PASSWORD}
+      - Stripe__SecretKey=${STRIPE_SECRET_KEY}
+      - Stripe__WebhookSecret=${STRIPE_WEBHOOK_SECRET}
+      - RabbitMQHost=rabbitmq
+    ports:
+      - "5173:5173" # REST
+      - "5174:5174" # gRPC
+    depends_on:
+      - postgres_db
+
+  reservation-service:
+    build: ./ReservationService
+    environment:
+      - ConnectionStrings__ReservationConn=Host=postgres_db;Database=reservationdb;Username=postgres;Password=${DB_PASSWORD}
+      - RabbitMQHost=rabbitmq
+      - GrpcPaymentService=http://payment-service:5174
+      - AppSettings__Token=${JWT_TOKEN_RESERVATION}
+    ports:
+      - "5002:8080"
+    depends_on:
+      - payment-service
+      - rabbitmq
