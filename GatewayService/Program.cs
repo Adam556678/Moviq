@@ -14,7 +14,8 @@ builder.Services
     .AddRemoteSchema("Users")
     .AddRemoteSchema("Movies")
     .AddRemoteSchema("Theater")
-    .AddRemoteSchema("Reservation");
+    .AddRemoteSchema("Reservation")
+    .AllowIntrospection(true);
 
 var app = builder.Build();
 

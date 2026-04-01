@@ -17,7 +17,8 @@ builder.Services
     .AddMutationType<UsersService.GraphQL.Mutation>()
     .AddProjections()
     .AddFiltering()
-    .AddSorting();
+    .AddSorting().
+    AllowIntrospection(true);
 
 var app = builder.Build();
 

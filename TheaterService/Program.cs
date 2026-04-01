@@ -75,7 +75,8 @@ builder.Services
     .AddType<TimeSpanType>()
     .AddProjections()
     .AddFiltering()
-    .AddSorting();
+    .AddSorting()
+    .AllowIntrospection(true);
 
 builder.Services.AddScoped<IRedisCacheService, RedisCacheService>();
 builder.Services.AddScoped<IHallRepository, HallRepository>();

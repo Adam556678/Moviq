@@ -66,7 +66,8 @@ builder.Services
     .AddMutationType<MoviesService.GraphQL.Mutation>()
     .AddProjections()
     .AddFiltering()
-    .AddSorting();
+    .AddSorting().
+    AllowIntrospection(true);
 
 builder.Services.AddScoped<IMovieRepo, MovieRepo>();
 builder.Services.AddScoped<IGenreRepo, GenreRepo>();

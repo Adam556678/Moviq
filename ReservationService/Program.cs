@@ -73,7 +73,8 @@ builder.Services
     .AddType<TimeSpanType>()
     .AddProjections()
     .AddFiltering()
-    .AddSorting();
+    .AddSorting()
+    .AllowIntrospection(true);
 
 builder.Services.AddSingleton<EventBusPublisher>();
 builder.Services.AddHostedService<TheaterEventsSubscriber>();
