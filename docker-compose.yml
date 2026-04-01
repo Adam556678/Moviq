@@ -7,8 +7,13 @@ services:
       - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   
-  redis_cahce:
+  redis_cache:
     image: redis:latest
 
     ports:
@@ -19,7 +24,11 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
-
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_running"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   # --- Application Services ---
 
   gateway-service:
@@ -32,10 +41,14 @@ services:
       - ServiceUrls__Theater=http://theater-service:8080/graphql
       - ServiceUrls__Reservation=http://reservation-service:8080/graphql
     depends_on:
-      - user-service
-      - movie-service
-      - theater-service
-      - reservation-service
+      user-service:
+        condition: service_started
+      movie-service:
+        condition: service_started
+      theater-service:
+        condition: service_started
+      reservation-service:
+        condition: service_started
 
   user-service:
     build: ./UsersService
@@ -45,7 +58,8 @@ services:
     ports:
       - "5289:8080"
     depends_on:
-      - postgres_db
+      postgres_db:
+        condition: service_healthy
 
   movie-service:
     build: ./MoviesService
@@ -56,9 +70,12 @@ services:
     ports:
       - "5099:8080"
     depends_on:
-      - postgres_db
-      - redis_cache
-      - rabbitmq
+      postgres_db:
+        condition: service_healthy
+      redis_cache:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
 
   theater-service:
     build: ./TheaterService
@@ -69,8 +86,12 @@ services:
     ports:
       - "5001:8080" 
     depends_on:
-      - postgres_db
-      - redis_cache
+      postgres_db:
+        condition: service_healthy
+      redis_cache:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
 
   payment-service:
     build: ./PaymentService
@@ -83,7 +104,10 @@ services:
       - "5173:5173" # REST
       - "5174:5174" # gRPC
     depends_on:
-      - postgres_db
+      postgres_db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
   reservation-service:
     build: ./ReservationService
@@ -95,5 +119,7 @@ services:
     ports:
       - "5002:8080"
     depends_on:
-      - payment-service
-      - rabbitmq
+      payment-service:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy

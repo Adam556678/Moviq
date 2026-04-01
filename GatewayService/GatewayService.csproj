@@ -7,10 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HotChocolate.AspNetCore" Version="15.1.12" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="13.9.14" />
     <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="10.5.5" />
-    <PackageReference Include="HotChocolate.Data" Version="15.1.12" />
-    <PackageReference Include="HotChocolate.Stitching" Version="13.9.15" />
+    <PackageReference Include="HotChocolate.Data" Version="13.9.14" />
+    <PackageReference Include="HotChocolate.Stitching" Version="13.9.14" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.14" />
   </ItemGroup>
 
