@@ -2,7 +2,7 @@
 **/bin/
 **/obj/
 
-# VS files
+# VS Files
 **/.vs/
 
 **/appsettings.json

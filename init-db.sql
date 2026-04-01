@@ -1,3 +1,4 @@
+
 CREATE DATABASE usersdb;
 CREATE DATABASE moviesdb;
 CREATE DATABASE theaterdb;
