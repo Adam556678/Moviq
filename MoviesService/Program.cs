@@ -91,5 +91,18 @@ app.UseAuthorization();
 app.MapGraphQL();
 
 // await PrepDb.PrepPopulation(app);
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>(); 
+    try 
+    {
+        Console.WriteLine("--> Running Migrations...");
+        context.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"--> Could not run migrations: {ex.Message}");
+    }
+}
 
 app.Run();

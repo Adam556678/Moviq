@@ -50,4 +50,18 @@ app.MapGet("/grpc", () => "Communication with gRPC endpoints must be made throug
 // app.UseHttpsRedirection();
 app.MapControllers();
 
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>(); 
+    try 
+    {
+        Console.WriteLine("--> Running Migrations...");
+        context.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"--> Could not run migrations: {ex.Message}");
+    }
+}
+
 app.Run();
