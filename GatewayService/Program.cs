@@ -24,6 +24,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
+
+app.MapGraphQL();
 
 app.Run();
