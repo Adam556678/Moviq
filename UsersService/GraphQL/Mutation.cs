@@ -40,8 +40,8 @@ namespace UsersService.GraphQL
                 new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.None, // Cookie is sent on ALL requests
+                    Secure = false, // http & https
+                    SameSite = SameSiteMode.Lax, 
                     Expires = DateTime.UtcNow.AddDays(1)
                 }
             );

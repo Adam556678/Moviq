@@ -40,6 +40,14 @@ namespace UsersService.Data
             // get user's credentials
             var credentials = await _context.UserCredentials
                 .FirstOrDefaultAsync(c => c.UserId == user.Id);
+            if (credentials == null)
+            {
+                return new LoginResponse
+                {
+                    LoginState = LoginState.InvalidCredentials
+                };
+            }
+                
 
             // verify user's password
             var passowrdVerify = new PasswordHasher<User>().VerifyHashedPassword(

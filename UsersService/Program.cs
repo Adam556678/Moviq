@@ -8,6 +8,16 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<AppDbContext>(opt => 
     opt.UseNpgsql(builder.Configuration.GetConnectionString("UsersConn")));
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+        policy
+            .WithOrigins("http://localhost:4000")
+            .AllowCredentials()
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
+
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddHttpContextAccessor();
 
@@ -27,7 +37,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.MapGraphQL();
 
@@ -44,5 +54,7 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine($"--> Could not run migrations: {ex.Message}");
     }
 }
+
+app.UseCors();
 
 app.Run();
