@@ -38,6 +38,7 @@ if (app.Environment.IsDevelopment())
 }
 
 // app.UseHttpsRedirection();
+app.UseCors();
 
 app.MapGraphQL();
 
@@ -55,6 +56,5 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-app.UseCors();
 
 app.Run();

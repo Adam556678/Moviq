@@ -1,14 +1,19 @@
+using GatewayService.CookieRelayHandler;
 using GatewayService.CookieRelayInterceptor;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddOpenApi();
+// allow request context from anywhere
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddTransient<SetCookieRelayHandler>();
 
 foreach (var service in new[] {"Users", "Movies", "Theater", "Reservation"})
 {
     builder.Services.AddHttpClient(service, 
-        c => c.BaseAddress = new Uri(builder.Configuration[$"ServiceUrls:{service}"]!));
+        c => c.BaseAddress = new Uri(builder.Configuration[$"ServiceUrls:{service}"]!))
+        .AddHttpMessageHandler<SetCookieRelayHandler>();
 }
 
 builder.Services.AddCors(options =>
