@@ -14,13 +14,25 @@ namespace GatewayService.CookieRelayHandler
         }
 
         // SendASync: Forwards the request to the next handler
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request, // outgoing request from gateway
+            CancellationToken cancellationToken
+        )
         {
+            var context = _httpContextAccessor.HttpContext; // get the incoming request from the browser
+
+            // ----- Browser -> Gateway -> Sub-services -----
+            // Grab cookies from the original browser request and attach them to the outgoing HTTP call
+            if (context?.Request.Headers.ContainsKey("Cookie") == true)
+            {
+                request.Headers.Add("Cookie", context.Request.Headers["Cookie"].ToString());
+            }
+
+            // ----- Sub-services -> Gateway -> Browser -----
             // check if the downstream service returned cookies
             var response = await base.SendAsync(request, cancellationToken);
             if (response.Headers.TryGetValues("Set-Cookie", out var cookies))
             {
-                var context = _httpContextAccessor.HttpContext;
                 if (context != null)
                 {
                     foreach (var cookie in cookies)

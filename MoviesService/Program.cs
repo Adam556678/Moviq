@@ -53,7 +53,6 @@ builder.Services
             }
         };
     });
-builder.Services.AddAuthorization();
 
 builder.Services
     .AddGraphQLServer()
