@@ -4,6 +4,7 @@ using HotChocolate.Data;
 using MoviesService.Models;
 using MoviesService.Services.Caching;
 using MoviesService.DTOs;
+using HotChocolate.Authorization;
 
 namespace MoviesService.GraphQL
 {
@@ -49,5 +50,21 @@ namespace MoviesService.GraphQL
         
         public async Task<IEnumerable<Genre>> GetGenres([Service] IGenreRepo repo) 
             => await repo.GetAllGenresAsync();
+    }
+
+    [ExtendObjectType("Query")]
+    public class AuthQuery
+    {
+        [Authorize]
+        public string WhoAmI([Service] IHttpContextAccessor accessor)
+        {
+            var user = accessor.HttpContext?.User;
+            var name = user?.Identity?.Name ?? "Unknown";
+            var roles = user?.Claims
+                .Where(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role")
+                .Select(c => c.Value);
+                
+            return $"User: {name}, Roles: {string.Join(", ", roles)}";
+        }
     }
 }

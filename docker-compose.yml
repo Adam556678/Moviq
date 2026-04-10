@@ -67,6 +67,7 @@ services:
       - ConnectionStrings__MoviesConn=Host=postgres_db;Database=moviesdb;Username=postgres;Password=${DB_PASSWORD}
       - ConnectionStrings__Redis=redis_cache:6379
       - RabbitMQHost=rabbitmq
+      - AppSettings__Token=${JWT_TOKEN_USER}
     ports:
       - "5099:8080"
     depends_on:
@@ -83,6 +84,7 @@ services:
       - ConnectionStrings__TheaterConn=Host=postgres_db;Database=theaterdb;Username=postgres;Password=${DB_PASSWORD}
       - ConnectionStrings__Redis=redis_cache:6379
       - RabbitMQHost=rabbitmq
+      - AppSettings__Token=${JWT_TOKEN_USER}
     ports:
       - "5001:8080" 
     depends_on:
@@ -100,6 +102,7 @@ services:
       - Stripe__SecretKey=${STRIPE_SECRET_KEY}
       - Stripe__WebhookSecret=${STRIPE_WEBHOOK_SECRET}
       - RabbitMQHost=rabbitmq
+      - AppSettings__Token=${JWT_TOKEN_USER}
     ports:
       - "5173:5173" # REST
       - "5174:5174" # gRPC

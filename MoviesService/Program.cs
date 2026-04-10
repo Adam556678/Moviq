@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MoviesService.Data;
+using MoviesService.GraphQL;
 using MoviesService.Services.AsyncDataService;
 using MoviesService.Services.Caching;
 
@@ -37,7 +38,8 @@ builder.Services
             ValidAudience = builder.Configuration["AppSettings:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Token"]!)
-            )
+            ),
+            RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
         };
 
         options.Events = new JwtBearerEvents
@@ -48,7 +50,24 @@ builder.Services
                 if (context.Request.Cookies.ContainsKey("jwt"))
                 {
                     context.Token = context.Request.Cookies["jwt"];
+                    Console.WriteLine("---> MOVIES SERVICE: JWT Cookie Received");
                 }
+                else
+                {
+                    Console.WriteLine("---> MOVIES SERVICE: JWT Cookie not received");
+                }
+                return Task.CompletedTask;
+            },
+
+            OnAuthenticationFailed = context =>
+            {
+                Console.WriteLine($"--> MOVIES: Auth Failed! Reason: {context.Exception.Message}");
+                return Task.CompletedTask;
+            },
+
+            OnTokenValidated = context =>
+            {
+                Console.WriteLine("--> MOVIES: Token successfully validated!");
                 return Task.CompletedTask;
             }
         };
@@ -62,6 +81,7 @@ builder.Services
     })
     .AddAuthorization()
     .AddQueryType<MoviesService.GraphQL.Query>()
+    .AddTypeExtension<AuthQuery>() // REMOVE LATER
     .AddMutationType<MoviesService.GraphQL.Mutation>()
     .AddProjections()
     .AddFiltering()

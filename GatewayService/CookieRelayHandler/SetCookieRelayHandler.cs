@@ -25,7 +25,14 @@ namespace GatewayService.CookieRelayHandler
             // Grab cookies from the original browser request and attach them to the outgoing HTTP call
             if (context?.Request.Headers.ContainsKey("Cookie") == true)
             {
-                request.Headers.Add("Cookie", context.Request.Headers["Cookie"].ToString());
+                var cookieValue = context.Request.Headers["Cookie"].ToString();
+                Console.WriteLine($"--> GATEWAY: Relaying Cookie to {request.RequestUri}: {cookieValue.Substring(0, Math.Min(20, cookieValue.Length))}...");
+        
+                request.Headers.Remove("Cookie");
+                request.Headers.TryAddWithoutValidation("Cookie", context.Request.Headers["Cookie"].ToString());
+            }else
+            {
+                Console.WriteLine($"--> GATEWAY: No Cookie found to relay for {request.RequestUri}");
             }
 
             // ----- Sub-services -> Gateway -> Browser -----

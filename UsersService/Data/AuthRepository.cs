@@ -234,7 +234,7 @@ namespace UsersService.Data
                 Encoding.UTF8.GetBytes(_configuration.GetValue<string>("AppSettings:Token")!)
             );
 
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
 
             var tokenDescriptor = new JwtSecurityToken(
                 issuer: _configuration.GetValue<string>("AppSettings:Issuer"), 
