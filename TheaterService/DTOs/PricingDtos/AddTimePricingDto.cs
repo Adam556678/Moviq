@@ -2,8 +2,8 @@ namespace TheaterService.DTOs.PricingDtos
 {
     public class AddTimePricingDto
     {
-        public TimeSpan StartHour { get; set; }
-        public TimeSpan EndHour { get; set; }
+        public required string StartHour { get; set; }
+        public required string EndHour { get; set; }
         public decimal Multiplier { get; set; }
     }
 }

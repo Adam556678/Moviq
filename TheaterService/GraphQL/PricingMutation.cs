@@ -4,7 +4,8 @@ using TheaterService.DTOs.PricingDtos;
 using TheaterService.Models;
 
 namespace TheaterService.GraphQL
-{
+{  
+    [ExtendObjectType(typeof(Mutation))]
     public class PricingMutation
     {
 
@@ -134,8 +135,8 @@ namespace TheaterService.GraphQL
         {
 
             var pricing = new TimePricing{
-                StartHour = timePricingDto.StartHour,
-                EndHour = timePricingDto.EndHour,
+                StartHour = TimeSpan.Parse(timePricingDto.StartHour),
+                EndHour = TimeSpan.Parse(timePricingDto.EndHour),
                 Multiplier = timePricingDto.Multiplier
             };
 
