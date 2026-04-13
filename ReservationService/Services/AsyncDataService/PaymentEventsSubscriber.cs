@@ -4,6 +4,7 @@ using System.Text.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using ReservationService.Data;
+using ReservationService.Models;
 using ReservationService.Services.Events;
 
 namespace ReservationService.Services.AsyncDataService
@@ -91,6 +92,11 @@ namespace ReservationService.Services.AsyncDataService
                         .Deserialize<PaymentStatusUpdatedEvent>(body);
                     if (paymentStatusUpdatedEvent == null)
                         throw new Exception("Failed to serialize PaymentStatusUpdated event.");
+
+                    // Set reservation status to confirmed
+                    await reservationRepo.UpdateReservationStatus(
+                        paymentStatusUpdatedEvent.ReservationId,
+                        ReservationStatus.Confirmed);
 
                     // Create a SeatTakenRequest
                     var reservation = await reservationRepo.GetByIdAsync(paymentStatusUpdatedEvent.ReservationId);

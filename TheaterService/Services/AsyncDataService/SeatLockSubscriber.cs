@@ -57,6 +57,12 @@ namespace TheaterService.Services.AsyncDataService
                 routingKey: "seat.locked"
             );
 
+            await _channel.QueueBindAsync(
+                queue: "reservation.theater",
+                exchange: "reservation.events",
+                routingKey: "seat.taken"
+            );
+
             Console.WriteLine("--> Listening for reservation events...");
         }
 

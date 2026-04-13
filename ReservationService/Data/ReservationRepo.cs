@@ -91,5 +91,16 @@ namespace ReservationService.Data
 
             return reservation;
         }
+
+        public async Task UpdateReservationStatus(Guid reservationId, ReservationStatus status)
+        {
+            var reservation = await _context.Reservations.FindAsync(reservationId);
+            if (reservation == null)
+                throw new InvalidOperationException($"Reservation with id: {reservationId} does not exist.");
+
+            // change status
+            reservation.Status = status;
+            await _context.SaveChangesAsync();
+        }
     }
 }
